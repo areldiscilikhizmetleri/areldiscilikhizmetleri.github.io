@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yönetim Paneli · Diş Protez Teknolojisi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#141C2B;--ink-2:#26334A;--ink-3:#5A6880;--porcelain:#F6F4EF;--plaster:#E8E3D7;--line:#D6D0C2;
+--acrylic:#C0687A;--alloy:#B98F2C;--mint:#1C7A67;--fail:#B23A2B;
+--f-disp:"Bricolage Grotesque",system-ui,sans-serif;--f-body:"Source Serif 4",Georgia,serif;--f-mono:"IBM Plex Mono",monospace}
+*{box-sizing:border-box}body{margin:0;font-family:var(--f-body);background:var(--porcelain);color:var(--ink);line-height:1.6}
+h1,h2,h3,.disp{font-family:var(--f-disp);letter-spacing:-.015em;margin:0;line-height:1.15}
+.mono{font-family:var(--f-mono)}button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--acrylic);outline-offset:2px}
+.hidden{display:none !important}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.btn{background:var(--ink);color:#fff;border:0;padding:10px 18px;border-radius:99px;font-family:var(--f-disp);font-weight:600;font-size:14px}
+.btn:hover{background:#000}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink-2);padding:8px 14px;border-radius:99px;font-family:var(--f-disp);font-size:13px}
+.ghost:hover{background:#fff;border-color:var(--ink-3)}
+/* giriş */
+#gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+#gate .box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:34px;max-width:460px;width:100%;box-shadow:0 20px 50px -40px rgba(20,28,43,.7)}
+#gate h1{font-size:28px;font-weight:800;margin:8px 0 6px}
+#gate p{color:var(--ink-3);font-size:15px}
+.oauth button{display:flex;align-items:center;gap:10px;justify-content:center;width:100%;background:#fff;border:1px solid var(--line);
+border-radius:12px;padding:12px;font-family:var(--f-disp);font-weight:600;font-size:14.5px;color:var(--ink);margin-top:10px}
+.oauth button:hover{border-color:var(--ink-2)}
+.field{margin-top:12px}.field input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font:15px var(--f-body)}
+.err{color:var(--fail);font-size:13.5px;min-height:20px;font-weight:600;margin:10px 0 0}
+/* panel */
+header{position:sticky;top:0;z-index:20;background:rgba(246,244,239,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header b{font-family:var(--f-disp);font-weight:800;font-size:15px}
+header .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
+main{max-width:1240px;margin:0 auto;padding:24px 22px 80px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:18px 0 22px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat span{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.stat b{display:block;font-family:var(--f-disp);font-size:26px;font-weight:800;margin-top:4px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.toolbar input{flex:1;min-width:220px;padding:10px 14px;border:1px solid var(--line);border-radius:99px;font:15px var(--f-body);background:#fff}
+.tablewrap{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:820px}
+th{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--ink)}
+td{padding:12px 14px;border-bottom:1px solid #EFEBE1;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#FCFBF8;cursor:pointer}
+.who b{display:block;font-family:var(--f-disp);font-weight:700;font-size:14.5px}
+.who span{font-size:12.5px;color:var(--ink-3);font-family:var(--f-mono)}
+.pbar{width:110px;height:6px;background:var(--plaster);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--acrylic),var(--alloy))}
+.tag{font-family:var(--f-mono);font-size:10px;padding:3px 8px;border-radius:99px;background:var(--plaster);color:var(--ink-2)}
+.tag.adm{background:var(--ink);color:#fff}
+.tag.on{background:rgba(28,122,103,.14);color:var(--mint)}
+/* detay */
+.drawer{position:fixed;inset:0;background:rgba(20,28,43,.45);z-index:60;display:flex;justify-content:flex-end}
+.sheet{background:var(--porcelain);width:min(560px,100%);height:100%;overflow:auto;padding:26px}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dotted var(--line);font-size:14.5px}
+.kv span{color:var(--ink-3);font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding-top:3px;white-space:nowrap}
+.kv b{font-weight:600;text-align:right}
+.mrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dotted var(--line);font-size:14px}
+.mrow .nm{flex:1}
+.note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;font-size:14.5px;white-space:pre-wrap}
+.note .h{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+textarea{width:100%;min-height:90px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;font:15px var(--f-body);resize:vertical;background:#fff}
+.sess{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);padding:7px 0;border-bottom:1px dotted var(--line);display:flex;justify-content:space-between;gap:10px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:99px;font-family:var(--f-disp);font-size:14px;z-index:90;transition:transform .3s}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<section id="gate">
+  <div class="box">
+    <p class="eyebrow">Diş Protez Teknolojisi</p>
+    <h1>Yönetim paneli</h1>
+    <p>Öğrenci kayıtlarını, giriş zamanlarını, sistemde geçirilen süreyi ve notları görüntülemek için yönetici hesabınızla giriş yapın.</p>
+    <div class="oauth">
+      <button id="g-btn">Google ile giriş yap</button>
+      <button id="ms-btn">Microsoft ile giriş yap</button>
+    </div>
+    <div id="dev-block" class="hidden">
+      <div class="field"><input id="in-name" placeholder="Ad Soyad"></div>
+      <div class="field"><input id="in-mail" type="email" placeholder="yonetici@universite.edu.tr"></div>
+      <button class="btn" style="width:100%;margin-top:12px" id="dev-btn">Giriş yap</button>
+    </div>
+    <p class="err" id="err"></p>
+  </div>
+</section>
+
+<div id="panel" class="hidden">
+  <header>
+    <b>Yönetim paneli</b><span class="tag" id="me">—</span>
+    <div class="sp">
+      <button class="ghost" onclick="loadUsers()">Yenile</button>
+      <button class="ghost" onclick="exportCsv()">CSV indir</button>
+      <button class="ghost" onclick="signOut()">Çıkış</button>
+    </div>
+  </header>
+  <main>
+    <div class="stats" id="stats"></div>
+    <div class="toolbar">
+      <input id="q" placeholder="Ada, e-postaya göre ara…" oninput="draw()">
+      <button class="ghost" onclick="only='all';draw()">Tümü</button>
+      <button class="ghost" onclick="only='active';draw()">Son 7 gün aktif</button>
+      <button class="ghost" onclick="only='stuck';draw()">İlerlemesi %25 altı</button>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr>
+        <th onclick="sortBy('name')">Öğrenci</th>
+        <th onclick="sortBy('pct')">İlerleme</th>
+        <th onclick="sortBy('exams')">Geçilen test</th>
+        <th onclick="sortBy('totalSeconds')">Toplam süre</th>
+        <th onclick="sortBy('loginCount')">Giriş</th>
+        <th onclick="sortBy('lastSeen')">Son etkinlik</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <p class="eyebrow" style="margin-top:14px">Satıra tıklayınca öğrencinin oturum geçmişi, modül dökümü ve notları açılır.</p>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "/api";     // sunucu farklı alan adındaysa tam adres yazın
+const MODS = [
+ ["m1","Hareketli Protez ve Uygulamaları-I"],["m2","Diş Hekimliğinde Maddeler Bilgisi"],
+ ["m3","Sabit Protez ve Uygulamaları-I"],["m4","Diş Morfolojisi ve Uygulamaları"],
+ ["m5","Hareketli Protez ve Uygulamaları-II"],["m6","Porselen Protezleri-I"],
+ ["m7","Hareketli Protez ve Uygulamaları-III"],["m8","Sabit Protez ve Uygulamaları-II"],
+ ["m9","Sterilizasyon ve Dezenfeksiyon Yöntemleri"],["m10","Porselen Protezleri-II"],
+ ["m11","Çene Yüz Protezleri"],["m12","İmplantüstü Protezler"]
+];
+const PASS = 70, STEPS = 6;
+let TOKEN = null, CFG = {}, USERS = [], sortKey = "lastSeen", sortDir = -1, only = "all";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+async function api(path, body){
+  const r = await fetch(API + path, {
+    method: body ? "POST" : "GET",
+    headers: Object.assign({"Content-Type":"application/json"}, TOKEN?{Authorization:"Bearer "+TOKEN}:{}),
+    body: body ? JSON.stringify(body) : undefined
+  });
+  let d=null; try{ d = await r.json(); }catch(e){}
+  if(!r.ok) throw new Error((d&&d.error)||"Sunucuya ulaşılamadı.");
+  return d;
+}
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._i); t._i=setTimeout(()=>t.classList.remove("show"),2400); }
+function fmt(sec){ sec=Math.round(sec||0); const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60);
+  return h? h+" sa "+m+" dk" : m? m+" dk" : sec+" sn"; }
+function dt(s){ return s ? new Date(s).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"}) : "—"; }
+function ago(s){ if(!s) return "—"; const d=(Date.now()-new Date(s))/1000;
+  if(d<3600) return Math.max(1,Math.round(d/60))+" dk önce";
+  if(d<86400) return Math.round(d/3600)+" sa önce";
+  return Math.round(d/86400)+" gün önce"; }
+
+/* ---- ilerleme hesabı (öğrenci uygulamasıyla aynı kural) ---- */
+function modPct(m){ if(!m) return 0;
+  const done = (m.read||[]).length + (m.match?1:0) + ((m.exam??0)>=PASS?1:0);
+  return Math.min(100, Math.round(done/STEPS*100)); }
+function overall(p){ const mods=(p&&p.modules)||{};
+  return Math.round(MODS.reduce((s,[id])=>s+modPct(mods[id]),0)/MODS.length); }
+function passedExams(p){ const mods=(p&&p.modules)||{};
+  return MODS.filter(([id])=>((mods[id]||{}).exam??0)>=PASS).length; }
+
+/* ---- giriş ---- */
+function loadScript(src){ return new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.async=true;s.onload=ok;s.onerror=no;document.head.appendChild(s);}); }
+async function boot(){
+  try{ CFG = await api("/config"); }
+  catch(e){ $("#err").textContent="Sunucuya bağlanılamadı. Sunucunun çalıştığından emin olun."; return; }
+  try{ TOKEN = sessionStorage.getItem("dpt-admin-token"); }catch(e){}
+  if(TOKEN){ try{ const me=await api("/me"); if(me.user.role==="admin"){ enter(me.user); return; } }catch(e){ TOKEN=null; } }
+
+  if(CFG.googleClientId){
+    try{
+      await loadScript("https://accounts.google.com/gsi/client");
+      google.accounts.id.initialize({ client_id: CFG.googleClientId,
+        callback: r => login("/auth/google", {credential:r.credential}) });
+      google.accounts.id.renderButton($("#g-btn"), {theme:"outline",size:"large",width:360,locale:"tr"});
+    }catch(e){}
+  } else $("#g-btn").onclick = ()=>$("#err").textContent="Google girişi sunucuda yapılandırılmamış.";
+
+  if(CFG.msClientId){
+    try{
+      await loadScript("https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js");
+      const c = new msal.PublicClientApplication({auth:{clientId:CFG.msClientId,
+        authority:"https://login.microsoftonline.com/"+(CFG.msTenant||"common"),
+        redirectUri: location.origin+location.pathname}, cache:{cacheLocation:"sessionStorage"}});
+      if(c.initialize) await c.initialize();
+      $("#ms-btn").onclick = async ()=>{
+        try{ const r = await c.loginPopup({scopes:["User.Read"],prompt:"select_account"});
+          login("/auth/microsoft",{accessToken:r.accessToken});
+        }catch(e){ $("#err").textContent="Microsoft girişi tamamlanamadı."; }
+      };
+    }catch(e){}
+  } else $("#ms-btn").onclick = ()=>$("#err").textContent="Microsoft girişi sunucuda yapılandırılmamış.";
+
+  if(CFG.devLogin){
+    $("#dev-block").classList.remove("hidden");
+    $("#dev-btn").onclick = ()=>login("/auth/dev",{name:$("#in-name").value,email:$("#in-mail").value});
+  }
+}
+async function login(path, body){
+  $("#err").textContent="";
+  try{
+    const r = await api(path, body);
+    if(r.user.role !== "admin"){ $("#err").textContent="Bu hesabın yönetici yetkisi yok. Sunucudaki ADMIN_EMAILS listesine eklenmeli."; return; }
+    TOKEN = r.token; try{ sessionStorage.setItem("dpt-admin-token",TOKEN); }catch(e){}
+    enter(r.user);
+  }catch(e){ $("#err").textContent = e.message; }
+}
+function enter(user){
+  $("#gate").classList.add("hidden"); $("#panel").classList.remove("hidden");
+  $("#me").textContent = user.email;
+  loadUsers();
+}
+function signOut(){ try{ sessionStorage.removeItem("dpt-admin-token"); }catch(e){} location.reload(); }
+
+/* ---- liste ---- */
+async function loadUsers(){
+  try{
+    USERS = (await api("/admin/users")).map(u=>({
+      ...u, pct: overall(u.progress), exams: passedExams(u.progress)
+    }));
+    stats(); draw(); toast("Liste güncellendi");
+  }catch(e){ toast(e.message); }
+}
+function stats(){
+  const total = USERS.length;
+  const week = USERS.filter(u=>u.lastSeen && (Date.now()-new Date(u.lastSeen))<7*864e5).length;
+  const avg = total? Math.round(USERS.reduce((s,u)=>s+u.pct,0)/total) : 0;
+  const time = USERS.reduce((s,u)=>s+u.totalSeconds,0);
+  const done = USERS.filter(u=>u.pct===100).length;
+  $("#stats").innerHTML = [
+    ["Kayıtlı öğrenci", total],["Son 7 günde aktif", week],["Ortalama ilerleme","%"+avg],
+    ["Tüm modülleri bitiren", done],["Toplam çalışma süresi", fmt(time)]
+  ].map(([k,v])=>`<div class="stat"><span>${k}</span><b style="${String(v).length>6?"font-size:19px":""}">${v}</b></div>`).join("");
+}
+function sortBy(k){ if(sortKey===k) sortDir*=-1; else {sortKey=k; sortDir=-1;} draw(); }
+function draw(){
+  const q = ($("#q").value||"").toLocaleLowerCase("tr");
+  let list = USERS.filter(u => !q || u.name.toLocaleLowerCase("tr").includes(q) || u.email.includes(q));
+  if(only==="active") list = list.filter(u=>u.lastSeen && (Date.now()-new Date(u.lastSeen))<7*864e5);
+  if(only==="stuck") list = list.filter(u=>u.pct<25);
+  list.sort((a,b)=>{ const x=a[sortKey], y=b[sortKey];
+    if(typeof x==="string") return sortDir*String(y||"").localeCompare(String(x||""),"tr");
+    return sortDir*((y||0)-(x||0)); });
+  $("#rows").innerHTML = list.length ? list.map(u=>`
+    <tr onclick="openUser('${u.id}')">
+      <td class="who"><b>${esc(u.name)} ${u.role==="admin"?'<span class="tag adm">yönetici</span>':""}</b><span>${esc(u.email)}</span></td>
+      <td><span class="pbar"><i style="width:${u.pct}%"></i></span><span class="mono">%${u.pct}</span></td>
+      <td class="mono">${u.exams} / 12</td>
+      <td class="mono">${fmt(u.totalSeconds)}</td>
+      <td class="mono">${u.loginCount}</td>
+      <td><span class="tag ${u.lastSeen&&(Date.now()-new Date(u.lastSeen))<9e5?"on":""}">${ago(u.lastSeen)}</span></td>
+    </tr>`).join("")
+    : `<tr><td colspan="6" style="padding:30px;text-align:center;color:var(--ink-3)">Ölçütlere uyan kayıt yok.</td></tr>`;
+}
+function exportCsv(){
+  fetch(API+"/admin/export.csv",{headers:{Authorization:"Bearer "+TOKEN}})
+    .then(r=>r.blob()).then(b=>{ const a=document.createElement("a");
+      a.href=URL.createObjectURL(b); a.download="ogrenci-raporu.csv"; a.click(); URL.revokeObjectURL(a.href); })
+    .catch(()=>toast("Dışa aktarma başarısız."));
+}
+
+/* ---- öğrenci detayı ---- */
+async function openUser(id){
+  let d; try{ d = await api("/admin/users/"+id); }catch(e){ return toast(e.message); }
+  const mods = (d.progress&&d.progress.modules)||{};
+  const notes = {}; d.notes.forEach(n=>notes[n.module_id]=n);
+  const w = document.createElement("div"); w.className="drawer"; w.id="drawer";
+  w.innerHTML = `<div class="sheet" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+      <div><p class="eyebrow">Öğrenci kaydı</p><h2 style="font-size:24px;font-weight:800;margin:6px 0">${esc(d.user.name)}</h2></div>
+      <button class="ghost" onclick="closeDrawer()">Kapat</button>
+    </div>
+    <div class="kv"><span>E-posta</span><b>${esc(d.user.email)}</b></div>
+    <div class="kv"><span>Giriş yöntemi</span><b>${esc(d.user.provider)}</b></div>
+    <div class="kv"><span>İlk giriş</span><b>${dt(d.user.firstLogin)}</b></div>
+    <div class="kv"><span>Son giriş</span><b>${dt(d.user.lastLogin)}</b></div>
+    <div class="kv"><span>Son etkinlik</span><b>${dt(d.user.lastSeen)}</b></div>
+    <div class="kv"><span>Toplam giriş</span><b>${d.user.loginCount} kez</b></div>
+    <div class="kv"><span>Sistemde geçen süre</span><b>${fmt(d.user.totalSeconds)}</b></div>
+    <div class="kv"><span>Genel ilerleme</span><b>%${overall(d.progress)}</b></div>
+
+    <p class="eyebrow" style="margin:22px 0 6px">Modül dökümü</p>
+    ${MODS.map(([id,title])=>{ const m=mods[id]||{}; const p=modPct(m);
+      return `<div class="mrow">
+        <span class="pbar"><i style="width:${p}%"></i></span>
+        <span class="nm">${esc(title)}</span>
+        <span class="mono" style="color:var(--ink-3)">${(m.read||[]).length}/4 bölüm</span>
+        <span class="mono" style="color:${(m.exam??0)>=PASS?"var(--mint)":"var(--ink-3)"}">${m.exam!=null?"test %"+m.exam:"test yok"}</span>
+      </div>`; }).join("")}
+
+    <p class="eyebrow" style="margin:22px 0 6px">Öğrencinin notları</p>
+    ${d.notes.length ? d.notes.map(n=>{
+      const t = (MODS.find(x=>x[0]===n.module_id)||[,n.module_id])[1];
+      return `<div class="note"><div class="h">${esc(t)} · ${dt(n.updated_at)}</div>${esc(n.text)}</div>`;
+    }).join("") : `<p style="color:var(--ink-3);font-size:14px">Bu öğrenci henüz not almamış.</p>`}
+
+    <p class="eyebrow" style="margin:22px 0 6px">Oturum geçmişi (son 100)</p>
+    ${d.sessions.length ? d.sessions.map(s=>`<div class="sess">
+        <span>${dt(s.started_at)} → ${dt(s.last_seen)}</span><span>${fmt(s.seconds)}</span></div>`).join("")
+      : `<p style="color:var(--ink-3);font-size:14px">Kayıtlı oturum yok.</p>`}
+
+    <p class="eyebrow" style="margin:22px 0 6px">Yönetici notu (yalnızca yöneticiler görür)</p>
+    <textarea id="anote" placeholder="Örnek: 5. modülde zorlanıyor, laboratuvar saatinde destek verilecek.">${esc(d.user.adminNote||"")}</textarea>
+    <button class="btn" style="margin-top:10px" onclick="saveNote('${d.user.id}')">Notu kaydet</button>
+  </div>`;
+  w.onclick = closeDrawer;
+  document.body.appendChild(w);
+}
+function closeDrawer(){ const d=$("#drawer"); if(d) d.remove(); }
+async function saveNote(id){
+  try{ await api("/admin/note", {userId:id, text:$("#anote").value}); toast("Not kaydedildi"); }
+  catch(e){ toast(e.message); }
+}
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeDrawer(); });
+boot();
+setInterval(()=>{ if(TOKEN && !$("#panel").classList.contains("hidden") && !$("#drawer")) loadUsers(); }, 120000);
+</script>
+</body>
+</html>

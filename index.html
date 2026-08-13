@@ -1,0 +1,2180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diş Protez Teknolojisi · İnteraktif Eğitim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141C2B; --ink-2:#26334A; --ink-3:#5A6880;
+  --porcelain:#F6F4EF; --plaster:#E8E3D7; --line:#D6D0C2;
+  --acrylic:#C0687A; --acrylic-d:#9E4E5F;
+  --alloy:#B98F2C; --mint:#1C7A67; --fail:#B23A2B;
+  --r:14px; --shadow:0 1px 0 #fff inset, 0 8px 24px -18px rgba(20,28,43,.55);
+  --f-disp:"Bricolage Grotesque",system-ui,sans-serif;
+  --f-body:"Source Serif 4",Georgia,serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--f-body); color:var(--ink); background:var(--porcelain);
+  background-image:radial-gradient(circle at 12% 8%, rgba(192,104,122,.06), transparent 40%),
+                   radial-gradient(circle at 88% 0%, rgba(185,143,44,.07), transparent 38%);
+  -webkit-font-smoothing:antialiased; line-height:1.62;
+}
+h1,h2,h3,h4,.disp{font-family:var(--f-disp); letter-spacing:-.015em; line-height:1.12; margin:0}
+.mono{font-family:var(--f-mono)}
+button{font:inherit; cursor:pointer}
+:focus-visible{outline:3px solid var(--acrylic); outline-offset:2px; border-radius:4px}
+.hidden{display:none !important}
+
+/* ---------- eyebrow / labels ---------- */
+.eyebrow{font-family:var(--f-mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3)}
+
+/* ---------- SIGNATURE: shade guide strip ---------- */
+.shadeguide{display:flex; gap:5px; align-items:flex-end}
+.tab{
+  width:26px; height:34px; border-radius:3px 3px 9px 9px; position:relative;
+  background:linear-gradient(180deg,#fff, #EDE7DA); border:1px solid var(--line);
+  display:flex; align-items:flex-end; justify-content:center; padding-bottom:2px;
+  font-family:var(--f-mono); font-size:9px; color:#A79E8B; transition:transform .25s, box-shadow .25s;
+}
+.tab.on{background:linear-gradient(180deg,#F3D9A0,#C98F52); color:#4A3413; border-color:#B98F2C;
+  box-shadow:0 6px 14px -10px rgba(185,143,44,.9); transform:translateY(-3px)}
+.tab.half{background:linear-gradient(180deg,#FBF1DE 50%,#EDE7DA 50%); color:#8B7B5B}
+.tab::after{content:""; position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+  width:6px; height:6px; border-radius:2px 2px 0 0; background:#BEB6A4}
+
+/* ---------- app frame ---------- */
+#app{max-width:1180px; margin:0 auto; padding:0 18px 90px}
+.topbar{
+  position:sticky; top:0; z-index:40; backdrop-filter:blur(10px);
+  background:rgba(246,244,239,.86); border-bottom:1px solid var(--line);
+  margin:0 -18px 0; padding:10px 18px; display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+}
+.brand{display:flex; align-items:center; gap:10px; margin-right:auto}
+.brand b{font-family:var(--f-disp); font-weight:800; font-size:15px; letter-spacing:-.02em}
+.brand small{display:block; font-family:var(--f-mono); font-size:9.5px; letter-spacing:.14em; color:var(--ink-3); text-transform:uppercase}
+.logo{width:34px;height:34px;flex:none}
+.who{display:flex; align-items:center; gap:9px; font-size:13px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;
+  font-family:var(--f-disp); font-weight:700; font-size:13px; flex:none}
+.ghost{background:transparent; border:1px solid var(--line); color:var(--ink-2); padding:7px 12px; border-radius:99px; font-size:12.5px; font-family:var(--f-disp); font-weight:500}
+.ghost:hover{background:#fff; border-color:var(--ink-3)}
+.btn{background:var(--ink); color:#fff; border:0; padding:11px 20px; border-radius:99px;
+  font-family:var(--f-disp); font-weight:600; font-size:14px; transition:transform .15s, background .2s}
+.btn:hover{background:#000; transform:translateY(-1px)}
+.btn:disabled{opacity:.4; cursor:not-allowed; transform:none}
+.btn.pink{background:var(--acrylic)} .btn.pink:hover{background:var(--acrylic-d)}
+
+/* ---------- login ---------- */
+.login-wrap{min-height:100vh; display:grid; grid-template-columns:1.05fr .95fr}
+.login-art{background:var(--ink); color:#fff; padding:52px 46px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden}
+.login-art h1{font-size:clamp(30px,3.4vw,46px); font-weight:800; max-width:12ch}
+.login-art h1 em{font-style:normal; color:#E9A7B4}
+.login-art p{color:#B7C0D2; max-width:44ch; font-size:15px}
+.arcs{position:absolute; right:-90px; bottom:-70px; opacity:.5}
+.login-form{padding:52px 46px; display:flex; flex-direction:column; justify-content:center; gap:18px; max-width:520px}
+.field label{display:block; font-family:var(--f-mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
+.field input{width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:#fff; font:15px var(--f-body); color:var(--ink)}
+.field input:focus{border-color:var(--ink-2); outline:none; box-shadow:0 0 0 3px rgba(192,104,122,.18)}
+.oauth{display:flex; flex-direction:column; gap:10px}
+.oauth button{display:flex; align-items:center; gap:12px; justify-content:center; width:100%; background:#fff;
+  border:1px solid var(--line); border-radius:12px; padding:13px; font-family:var(--f-disp); font-weight:600; font-size:14.5px; color:var(--ink)}
+.oauth button:hover{border-color:var(--ink-2); box-shadow:var(--shadow)}
+.rule{display:flex; align-items:center; gap:12px; color:var(--ink-3); font-family:var(--f-mono); font-size:10.5px; letter-spacing:.12em}
+.rule::before,.rule::after{content:""; height:1px; background:var(--line); flex:1}
+.notice{font-size:13px; background:#fff; border:1px solid var(--line); border-left:3px solid var(--alloy); padding:11px 14px; border-radius:0 10px 10px 0; color:var(--ink-2)}
+.err{color:var(--fail); font-size:13.5px; min-height:20px; font-weight:600}
+@media(max-width:860px){ .login-wrap{grid-template-columns:1fr} .login-art{padding:34px 24px} .login-form{padding:30px 24px; max-width:none} }
+
+/* ---------- dashboard ---------- */
+.hero{padding:34px 0 26px; border-bottom:1px solid var(--line); margin-bottom:26px}
+.hero h1{font-size:clamp(26px,3.6vw,40px); font-weight:800; margin-bottom:10px}
+.hero p{color:var(--ink-2); max-width:62ch; margin:0}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:24px}
+.stat{background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; box-shadow:var(--shadow)}
+.stat b{display:block; font-family:var(--f-disp); font-size:26px; font-weight:800; line-height:1.1; margin-top:4px}
+.stat span{font-family:var(--f-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.guide-row{margin-top:26px; background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; overflow-x:auto}
+.guide-row .shadeguide{min-width:max-content}
+
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px}
+.card{background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:18px; text-align:left;
+  display:flex; flex-direction:column; gap:10px; width:100%; transition:transform .18s, box-shadow .18s, border-color .18s}
+.card:hover{transform:translateY(-3px); box-shadow:0 18px 34px -26px rgba(20,28,43,.6); border-color:var(--ink-3)}
+.card .top{display:flex; align-items:flex-start; gap:12px}
+.card h3{font-size:17px; font-weight:700; flex:1}
+.chip{font-family:var(--f-mono); font-size:10px; letter-spacing:.1em; padding:4px 8px; border-radius:99px; background:var(--plaster); color:var(--ink-2); white-space:nowrap}
+.card p{margin:0; font-size:13.5px; color:var(--ink-3); line-height:1.5}
+.bar{height:6px; background:var(--plaster); border-radius:99px; overflow:hidden}
+.bar i{display:block; height:100%; background:linear-gradient(90deg,var(--acrylic),var(--alloy)); border-radius:99px; transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.meta{display:flex; justify-content:space-between; font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3); letter-spacing:.06em}
+.done-flag{color:var(--mint); font-weight:600}
+
+/* ---------- module view ---------- */
+.crumbs{display:flex; gap:10px; align-items:center; padding:22px 0 8px; font-family:var(--f-mono); font-size:11px; letter-spacing:.1em; color:var(--ink-3); text-transform:uppercase}
+.mod-head{border-bottom:1px solid var(--line); padding-bottom:20px; margin-bottom:22px}
+.mod-head h1{font-size:clamp(24px,3.2vw,36px); font-weight:800; margin-bottom:8px}
+.steps{display:flex; gap:6px; flex-wrap:wrap; margin-top:16px}
+.step{font-family:var(--f-mono); font-size:11px; padding:6px 11px; border-radius:99px; border:1px solid var(--line); background:#fff; color:var(--ink-3)}
+.step.cur{background:var(--ink); color:#fff; border-color:var(--ink)}
+.step.ok{border-color:var(--mint); color:var(--mint)}
+.panel{background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:clamp(18px,3vw,32px); box-shadow:var(--shadow)}
+.panel h2{font-size:23px; font-weight:700; margin-bottom:14px}
+.panel h4{font-family:var(--f-disp); font-size:15px; font-weight:700; margin:22px 0 6px}
+.panel p{margin:0 0 12px; font-size:16px}
+.panel ul{margin:0 0 14px; padding-left:20px} .panel li{margin-bottom:6px; font-size:15.5px}
+.panel b{color:var(--acrylic-d)}
+.figure{margin:20px 0; background:linear-gradient(180deg,#FCFBF8,#F1EDE3); border:1px solid var(--line); border-radius:12px; padding:16px}
+.figure svg{width:100%; height:auto; display:block}
+.figure figcaption{font-family:var(--f-mono); font-size:11px; color:var(--ink-3); margin-top:10px; letter-spacing:.04em}
+.video{margin:20px 0}
+.video .frame{position:relative; padding-top:56.25%; background:var(--ink); border-radius:12px; overflow:hidden}
+.video iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+.video .placeholder{position:absolute; inset:0; display:grid; place-content:center; gap:8px; text-align:center; color:#B7C0D2; padding:20px}
+.video .placeholder b{font-family:var(--f-disp); color:#fff; font-size:15px}
+.nav-row{display:flex; gap:10px; justify-content:space-between; margin-top:24px; flex-wrap:wrap}
+
+/* ---------- quiz ---------- */
+.q{border-top:1px solid var(--line); padding-top:20px; margin-top:20px}
+.q:first-of-type{border-top:0; padding-top:0; margin-top:0}
+.q .qtext{font-family:var(--f-disp); font-weight:700; font-size:17px; margin-bottom:12px; display:flex; gap:10px}
+.q .qtext span{font-family:var(--f-mono); font-size:12px; color:var(--acrylic); padding-top:3px}
+.opt{display:block; width:100%; text-align:left; background:#fff; border:1px solid var(--line); border-radius:10px;
+  padding:11px 14px; margin-bottom:8px; font:15.5px var(--f-body); color:var(--ink); transition:.15s}
+.opt:hover:not(:disabled){border-color:var(--ink-2); background:#FCFBF8}
+.opt.sel{border-color:var(--ink); box-shadow:0 0 0 2px rgba(20,28,43,.12)}
+.opt.right{border-color:var(--mint); background:rgba(28,122,103,.08); font-weight:600}
+.opt.wrong{border-color:var(--fail); background:rgba(178,58,43,.07)}
+.why{font-size:14px; background:var(--plaster); border-radius:10px; padding:10px 13px; margin-top:4px; color:var(--ink-2)}
+.score{text-align:center; padding:22px}
+.score .num{font-family:var(--f-disp); font-size:56px; font-weight:800; line-height:1}
+.score .num.pass{color:var(--mint)} .score .num.no{color:var(--fail)}
+
+/* ---------- matching ---------- */
+.match{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media(max-width:640px){.match{grid-template-columns:1fr}}
+.col-h{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-bottom:8px}
+.mitem{display:block; width:100%; text-align:left; background:#fff; border:1px dashed var(--line); border-radius:10px;
+  padding:11px 13px; margin-bottom:8px; font:15px var(--f-body); color:var(--ink); transition:.15s; position:relative}
+.mitem:hover:not(:disabled){border-color:var(--ink-2)}
+.mitem.sel{border-style:solid; border-color:var(--ink); background:#FCFBF8}
+.mitem.done{border-style:solid; border-color:var(--mint); background:rgba(28,122,103,.07); cursor:default; color:var(--ink-2)}
+.mitem.shake{animation:sh .32s} @keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.mitem .pin{font-family:var(--f-mono); font-size:10px; color:var(--mint); position:absolute; right:10px; top:11px}
+
+/* ---------- profile / drawer ---------- */
+.drawer{position:fixed; inset:0; background:rgba(20,28,43,.4); display:grid; place-items:center; z-index:60; padding:18px}
+.drawer .box{background:var(--porcelain); border-radius:18px; max-width:520px; width:100%; padding:26px; max-height:88vh; overflow:auto}
+.kv{display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px dotted var(--line); font-size:14.5px}
+.kv span{color:var(--ink-3); font-family:var(--f-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; padding-top:3px}
+.kv b{font-weight:600; text-align:right}
+.toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(80px); background:var(--ink); color:#fff;
+  padding:12px 20px; border-radius:99px; font-family:var(--f-disp); font-weight:600; font-size:14px; z-index:80; transition:transform .3s; box-shadow:0 12px 30px -12px rgba(0,0,0,.6)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important}}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<section id="login" class="login-wrap">
+  <div class="login-art">
+    <div class="brand" style="color:#fff">
+      <svg class="logo" viewBox="0 0 40 40" fill="none"><path d="M20 6c-3 0-4-2-7-2-4 0-7 3-7 8 0 7 3 10 4 15 1 4 2 7 4 7s2-6 6-6 4 6 6 6 3-3 4-7c1-5 4-8 4-15 0-5-3-8-7-8-3 0-4 2-7 2z" fill="#F6F4EF"/><path d="M20 14v12M14 19h12" stroke="#141C2B" stroke-width="1.6"/></svg>
+      <div><b>Diş Protez Teknolojisi</b><small>İnteraktif Eğitim Modülü</small></div>
+    </div>
+    <div>
+      <p class="eyebrow" style="color:#8E9AB2">Ön Lisans · 12 Modül · Türkçe</p>
+      <h1>Mumdan porselene, <em>ölçüden</em> teslime.</h1>
+      <p>Teorik anlatım, laboratuvar şemaları, eşleştirme çalışmaları, ara quizler ve modül bitirme testleriyle protez teknikerliği eğitimi.</p>
+    </div>
+    <svg class="arcs" width="320" height="320" viewBox="0 0 320 320" fill="none" stroke="#3A4761" stroke-width="1.2">
+      <path d="M40 250c0-70 50-120 120-120s120 50 120 120"/><path d="M70 250c0-52 38-90 90-90s90 38 90 90"/><path d="M100 250c0-34 24-60 60-60s60 26 60 60"/>
+    </svg>
+  </div>
+  <div class="login-form">
+    <div>
+      <p class="eyebrow">Öğrenci girişi</p>
+      <h2 style="font-size:28px;font-weight:800;margin:6px 0 8px">Kurumsal hesabınla gir</h2>
+      <p style="margin:0;color:var(--ink-3);font-size:15px">Sisteme yalnızca <b class="mono">.edu.tr</b> uzantılı üniversite e-posta adresleri kabul edilir.</p>
+    </div>
+    <div class="oauth">
+      <button id="g-btn"><svg width="19" height="19" viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-4H24v7.5h12c-.2 2-1.5 5-4.4 7l6.7 5.2C42.2 36 45 30.6 45 24z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.9-5.4c-1.9 1.3-4.4 2.2-7.6 2.2-5.8 0-10.7-3.8-12.5-9.1l-7.1 5.5C8 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.5 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 9.9l7.1-5.5z"/><path fill="#EA4335" d="M24 10.6c3.3 0 5.5 1.4 6.8 2.6l6-5.9C33.1 3.9 29.9 2 24 2 15.4 2 8 6.9 4.4 14.1l7.1 5.5c1.8-5.3 6.7-9 12.5-9z"/></svg> Google ile giriş yap</button>
+      <button id="ms-btn"><svg width="18" height="18" viewBox="0 0 23 23"><rect x="1" y="1" width="10" height="10" fill="#F25022"/><rect x="12" y="1" width="10" height="10" fill="#7FBA00"/><rect x="1" y="12" width="10" height="10" fill="#00A4EF"/><rect x="12" y="12" width="10" height="10" fill="#FFB900"/></svg> Microsoft / Outlook ile giriş yap</button>
+    </div>
+    <div class="rule">VEYA</div>
+    <div class="field"><label for="in-name">Ad Soyad</label><input id="in-name" autocomplete="name" placeholder="Elif Yıldırım"></div>
+    <div class="field"><label for="in-mail">Üniversite e-postası</label><input id="in-mail" type="email" autocomplete="email" placeholder="ogrenci@ogr.universite.edu.tr"></div>
+    <p class="err" id="login-err"></p>
+    <button class="btn" id="local-btn">Girişi tamamla</button>
+    <p class="notice" id="setup-note">Sunucu bağlantısı denetleniyor…</p>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app" class="hidden">
+  <header class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 40 40" fill="none"><path d="M20 6c-3 0-4-2-7-2-4 0-7 3-7 8 0 7 3 10 4 15 1 4 2 7 4 7s2-6 6-6 4 6 6 6 3-3 4-7c1-5 4-8 4-15 0-5-3-8-7-8-3 0-4 2-7 2z" fill="#141C2B"/><path d="M20 14v12M14 19h12" stroke="#F6F4EF" stroke-width="1.6"/></svg>
+      <div><b>Diş Protez Teknolojisi</b><small>İnteraktif Eğitim Modülü</small></div>
+    </div>
+    <button class="ghost" id="home-btn">Modüller</button>
+    <button class="ghost" id="prof-btn">Profilim</button>
+    <button class="ghost hidden" id="admin-btn" onclick="window.open('admin.html','_blank')">Yönetim paneli</button>
+    <div class="who"><div class="avatar" id="ava">—</div></div>
+  </header>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* =====================================================================
+   YAPILANDIRMA
+   Sunucu kullanıyorsanız yalnızca apiBase'i doğru ayarlamanız yeterli;
+   istemci kimliklerini sunucudan (/api/config) otomatik okur.
+   ===================================================================== */
+const CONFIG = {
+  // Sunucunun adresi. Aynı alan adındaysa "/api" bırakın.
+  // Farklı alan adındaysa: "https://protez.universite.edu.tr/api"
+  apiBase: "/api",
+  // Modül kimliğine göre YouTube video kimlikleri: { m1:"VIDEOID", ... }
+  videos: {},
+  passMark: 70,              // bitirme testi geçme yüzdesi
+  allowedSuffix: ".edu.tr",  // sunucu bağlıysa sunucudaki değer geçerlidir
+  googleClientId: "", msClientId: "", msTenant: "common", devLogin: true
+};
+
+let ONLINE = false;      // sunucuya bağlanıldı mı
+let TOKEN = null;        // oturum jetonu
+
+/* =====================================================================
+   API KATMANI
+   ===================================================================== */
+async function api(path, opts = {}) {
+  const r = await fetch(CONFIG.apiBase + path, {
+    method: opts.body ? "POST" : "GET",
+    headers: Object.assign(
+      { "Content-Type": "application/json" },
+      TOKEN ? { Authorization: "Bearer " + TOKEN } : {}
+    ),
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  let data = null;
+  try { data = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error((data && data.error) || "Sunucuya ulaşılamadı.");
+  return data;
+}
+
+/* Sunucu yokken (dosya doğrudan açıldığında) yerel yedek depolama */
+const mem = {};
+const Local = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return mem[k] ?? null; } },
+  set(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* =====================================================================
+   DURUM
+   ===================================================================== */
+const state = { user: null, prog: {}, notes: {}, key: "", tick: null, beat: null };
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._i); t._i = setTimeout(() => t.classList.remove("show"), 2600);
+}
+function fmtTime(sec) {
+  sec = Math.max(0, Math.round(sec));
+  const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60);
+  if (h) return h + " sa " + m + " dk";
+  if (m) return m + " dk";
+  return sec + " sn";
+}
+function initials(n) { return n.trim().split(/\s+/).slice(0, 2).map(w => w[0] || "").join("").toLocaleUpperCase("tr"); }
+function validEdu(mail) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(mail).trim()) &&
+         String(mail).toLowerCase().trim().endsWith(CONFIG.allowedSuffix);
+}
+
+/* =====================================================================
+   OTURUM
+   ===================================================================== */
+function startApp(user, progress, notes) {
+  state.user = user;
+  state.prog = progress && progress.modules ? progress : { seconds: 0, firstSeen: new Date().toISOString(), modules: {} };
+  state.notes = notes || {};
+  state.key = "dpt:" + user.email;
+  if (ONLINE && typeof user.totalSeconds === "number") state.prog.seconds = user.totalSeconds;
+
+  $("#login").classList.add("hidden");
+  $("#app").classList.remove("hidden");
+  $("#ava").textContent = initials(user.name);
+  $("#ava").title = user.name + " · " + user.email;
+  if (user.role === "admin") $("#admin-btn").classList.remove("hidden");
+
+  clearInterval(state.beat); clearInterval(state.tick);
+  if (ONLINE) {
+    // süreyi sunucu sayar
+    state.beat = setInterval(async () => {
+      if (document.hidden) return;
+      try { const r = await api("/heartbeat", { body: {} }); state.prog.seconds = r.totalSeconds; }
+      catch (e) {}
+    }, 30000);
+  } else {
+    state.tick = setInterval(() => { state.prog.seconds += 15; save(); }, 15000);
+  }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) save(); });
+  window.addEventListener("beforeunload", save);
+  renderHome();
+}
+
+async function serverLogin(path, body) {
+  const err = $("#login-err"); err.textContent = "";
+  try {
+    const r = await api(path, { body });
+    TOKEN = r.token;
+    try { sessionStorage.setItem("dpt-token", TOKEN); } catch (e) {}
+    startApp(r.user, r.progress, r.notes);
+  } catch (e) { err.textContent = e.message; }
+}
+
+/* Sunucusuz (çevrimdışı) giriş — yalnızca dosya tek başına açıldığında */
+function offlineLogin(name, email) {
+  const err = $("#login-err");
+  if (!validEdu(email)) { err.textContent = "Yalnızca " + CONFIG.allowedSuffix + " uzantılı üniversite adresleri kabul edilir."; return; }
+  if (String(name).trim().length < 3) { err.textContent = "Ad ve soyadını yaz."; return; }
+  const key = "dpt:" + email.toLowerCase().trim();
+  const saved = Local.get(key) || { seconds: 0, firstSeen: new Date().toISOString(), modules: {} };
+  startApp({ name: name.trim(), email: email.toLowerCase().trim(), role: "student", provider: "çevrimdışı" }, saved, Local.get(key + ":notes") || {});
+}
+
+let saveTimer = null;
+function save() {
+  if (!state.user) return;
+  if (ONLINE) {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { api("/progress", { body: { progress: state.prog } }).catch(() => {}); }, 600);
+  } else {
+    Local.set(state.key, state.prog);
+  }
+}
+function saveNote(moduleId, text) {
+  state.notes[moduleId] = text;
+  if (ONLINE) api("/notes", { body: { moduleId, text } }).catch(() => {});
+  else Local.set(state.key + ":notes", state.notes);
+}
+function signOut() {
+  save();
+  clearInterval(state.tick); clearInterval(state.beat);
+  try { sessionStorage.removeItem("dpt-token"); } catch (e) {}
+  TOKEN = null; state.user = null;
+  location.reload();
+}
+
+function mp(id) {
+  if (!state.prog.modules[id]) state.prog.modules[id] = { read: [], quiz: {}, match: 0, exam: null, seconds: 0, total: 6 };
+  return state.prog.modules[id];
+}
+
+/* =====================================================================
+   KİMLİK SAĞLAYICILAR
+   ===================================================================== */
+function loadScript(src) {
+  return new Promise((ok, no) => {
+    const s = document.createElement("script");
+    s.src = src; s.async = true; s.onload = ok; s.onerror = no;
+    document.head.appendChild(s);
+  });
+}
+
+async function initGoogle() {
+  const btn = $("#g-btn");
+  if (!CONFIG.googleClientId) {
+    btn.addEventListener("click", () => $("#login-err").textContent =
+      "Google girişi henüz yapılandırılmamış. Sunucudaki GOOGLE_CLIENT_ID değerini doldurun.");
+    return;
+  }
+  try {
+    await loadScript("https://accounts.google.com/gsi/client");
+    google.accounts.id.initialize({
+      client_id: CONFIG.googleClientId,
+      callback: res => serverLogin("/auth/google", { credential: res.credential })
+    });
+    google.accounts.id.renderButton(btn, { theme: "outline", size: "large", width: 340, locale: "tr", text: "signin_with" });
+    btn.addEventListener("click", () => google.accounts.id.prompt());
+  } catch (e) {
+    btn.addEventListener("click", () => $("#login-err").textContent = "Google servisine ulaşılamadı.");
+  }
+}
+
+async function initMicrosoft() {
+  const btn = $("#ms-btn");
+  if (!CONFIG.msClientId) {
+    btn.addEventListener("click", () => $("#login-err").textContent =
+      "Microsoft girişi henüz yapılandırılmamış. Sunucudaki MS_CLIENT_ID değerini doldurun.");
+    return;
+  }
+  try {
+    await loadScript("https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js");
+    const client = new msal.PublicClientApplication({
+      auth: {
+        clientId: CONFIG.msClientId,
+        authority: "https://login.microsoftonline.com/" + CONFIG.msTenant,
+        redirectUri: location.origin + location.pathname
+      },
+      cache: { cacheLocation: "sessionStorage" }
+    });
+    if (client.initialize) await client.initialize();
+    btn.addEventListener("click", async () => {
+      try {
+        const r = await client.loginPopup({ scopes: ["User.Read"], prompt: "select_account" });
+        let at = r.accessToken;
+        if (!at) {
+          const t = await client.acquireTokenSilent({ scopes: ["User.Read"], account: r.account });
+          at = t.accessToken;
+        }
+        serverLogin("/auth/microsoft", { accessToken: at });
+      } catch (e) { $("#login-err").textContent = "Microsoft girişi tamamlanamadı."; }
+    });
+  } catch (e) {
+    btn.addEventListener("click", () => $("#login-err").textContent = "Microsoft servisine ulaşılamadı.");
+  }
+}
+
+/* =====================================================================
+   ŞEMALAR (SVG)
+   ===================================================================== */
+const FIG = {
+  tooth:{cap:"Şekil — Bir dişin katmanları ve destek dokuları",svg:`<svg viewBox="0 0 620 300"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 12px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  <path d="M250 30c-30 0-40 22-40 55 0 40 8 60 12 95 3 26 6 60 16 60s8-45 22-45 12 45 22 45 13-34 16-60c4-35 12-55 12-95 0-33-10-55-40-55z" fill="#FBF8F1" stroke="#141C2B" stroke-width="2"/>
+  <path d="M250 45c-24 0-32 18-32 45 0 30 6 46 10 72h44c4-26 10-42 10-72 0-27-8-45-32-45z" fill="#F0E7D6" stroke="#C0687A" stroke-width="1.4"/>
+  <path d="M250 62c-13 0-17 12-17 30 0 24 5 40 7 70 2 22 4 45 10 45s8-23 10-45c2-30 7-46 7-70 0-18-4-30-17-30z" fill="#E9C0CA" stroke="#9E4E5F" stroke-width="1.2"/>
+  <path d="M150 160c30-6 60-8 200-8 60 0 90 2 120 8v18c-40-6-70-8-120-8-140 0-170 2-200 8z" fill="#C0687A" opacity=".55"/>
+  <path d="M150 178h320v70H150z" fill="#EDE7DA" opacity=".7"/>
+  <g stroke="#5A6880" stroke-width="1" stroke-dasharray="3 3">
+  <path d="M285 60h90M285 90h90M285 120h90M330 175h45M180 168h50"/></g>
+  <text class="t" x="380" y="63">Mine (enamel)</text><text class="l" x="380" y="78">en sert doku, %96 mineral</text>
+  <text class="t" x="380" y="93">Dentin</text><text class="l" x="380" y="108">rengi belirleyen katman</text>
+  <text class="t" x="380" y="123">Pulpa</text><text class="l" x="380" y="138">damar-sinir odası</text>
+  <text class="t" x="380" y="178">Dişeti kenarı</text>
+  <text class="t" x="60" y="165">Sement</text><text class="l" x="60" y="180">kök yüzeyi</text>
+  <text class="l" x="60" y="215">Alveol kemiği</text></svg>`},
+
+  denture:{cap:"Şekil — Total protezde destek, tutuculuk ve stabilite bölgeleri",svg:`<svg viewBox="0 0 620 320"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 12px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  <path d="M310 40c-95 0-165 55-165 135 0 60 30 105 55 105 18 0 22-30 30-55 10-32 40-45 80-45s70 13 80 45c8 25 12 55 30 55 25 0 55-45 55-105 0-80-70-135-165-135z" fill="#C0687A" opacity=".2" stroke="#9E4E5F" stroke-width="2"/>
+  <path d="M310 60c-80 0-142 46-142 115" fill="none" stroke="#B98F2C" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <path d="M310 60c80 0 142 46 142 115" fill="none" stroke="#B98F2C" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <g fill="#FBF8F1" stroke="#141C2B" stroke-width="1.3">
+  <ellipse cx="310" cy="72" rx="16" ry="20"/><ellipse cx="272" cy="78" rx="14" ry="18"/><ellipse cx="348" cy="78" rx="14" ry="18"/>
+  <ellipse cx="240" cy="95" rx="15" ry="17"/><ellipse cx="380" cy="95" rx="15" ry="17"/>
+  <rect x="200" y="118" width="30" height="26" rx="6"/><rect x="390" y="118" width="30" height="26" rx="6"/>
+  <rect x="185" y="152" width="32" height="30" rx="6"/><rect x="403" y="152" width="32" height="30" rx="6"/></g>
+  <ellipse cx="310" cy="180" rx="72" ry="52" fill="#EDE7DA" stroke="#5A6880" stroke-dasharray="4 4"/>
+  <text class="t" x="272" y="180">Damak (palatinal)</text><text class="l" x="268" y="196">birincil destek alanı</text>
+  <path d="M452 200h60" stroke="#5A6880" stroke-dasharray="3 3"/><text class="t" x="470" y="196">Postpalatinal</text><text class="l" x="470" y="212">kapanma alanı — vakum</text>
+  <path d="M120 240h60" stroke="#5A6880" stroke-dasharray="3 3"/><text class="t" x="20" y="236">Vestibül kenarı</text><text class="l" x="20" y="252">kenar bütünlüğü = tutuculuk</text>
+  <text class="l" x="20" y="290">Sarı kesik çizgi: protezin uzanması gereken kenar sınırı</text></svg>`},
+
+  rpd:{cap:"Şekil — Bölümlü protez iskeletinin bileşenleri",svg:`<svg viewBox="0 0 620 300"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 12px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  <path d="M310 45c-90 0-155 52-155 125 0 40 18 75 34 75 14 0 16-26 24-46 10-26 40-38 97-38s87 12 97 38c8 20 10 46 24 46 16 0 34-35 34-75 0-73-65-125-155-125z" fill="#F0E7D6" stroke="#D6D0C2"/>
+  <g fill="#fff" stroke="#141C2B" stroke-width="1.2">
+  <ellipse cx="310" cy="70" rx="15" ry="18"/><ellipse cx="270" cy="76" rx="13" ry="17"/><ellipse cx="350" cy="76" rx="13" ry="17"/>
+  <rect x="205" y="112" width="28" height="24" rx="5"/><rect x="387" y="112" width="28" height="24" rx="5"/></g>
+  <path d="M233 124c22 6 30 22 26 40M387 124c-22 6-30 22-26 40" fill="none" stroke="#B98F2C" stroke-width="5" stroke-linecap="round"/>
+  <path d="M205 118h32" stroke="#B98F2C" stroke-width="6" stroke-linecap="round"/><path d="M383 118h32" stroke="#B98F2C" stroke-width="6" stroke-linecap="round"/>
+  <path d="M259 164c30 26 72 26 102 0" fill="none" stroke="#5A6880" stroke-width="10" stroke-linecap="round"/>
+  <path d="M240 200c40 34 100 34 140 0" fill="none" stroke="#5A6880" stroke-width="7" stroke-linecap="round" opacity=".5"/>
+  <text class="t" x="20" y="120">Kroşe kolu</text><text class="l" x="20" y="136">tutuculuk — alt açıya girer</text>
+  <text class="t" x="20" y="164">Oklüzal tırnak</text><text class="l" x="20" y="180">desteği dişe aktarır</text>
+  <text class="t" x="455" y="176">Büyük bağlayıcı</text><text class="l" x="455" y="192">kuvveti dağıtır, rijit</text>
+  <text class="t" x="455" y="222">Küçük bağlayıcı</text><text class="l" x="455" y="238">parçaları iskelete bağlar</text></svg>`},
+
+  crown:{cap:"Şekil — Kron preparasyonunda bitim çizgisi tipleri",svg:`<svg viewBox="0 0 620 260"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 13px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  <g stroke="#141C2B" stroke-width="2" fill="#FBF8F1">
+  <path d="M60 210V110c0-25 12-40 35-40s35 15 35 40v100z"/><path d="M60 210h70" stroke-width="0"/>
+  <path d="M255 210V110c0-25 12-40 35-40s35 15 35 40v100z"/>
+  <path d="M450 210V110c0-25 12-40 35-40s35 15 35 40v100z"/></g>
+  <path d="M45 210h100l-6-38-88 1z" fill="#E9C0CA" stroke="#9E4E5F"/>
+  <path d="M240 210h100l-10-38H250z" fill="#E9C0CA" stroke="#9E4E5F"/>
+  <path d="M435 210h100l-8-38H443z" fill="#E9C0CA" stroke="#9E4E5F"/>
+  <path d="M51 172h88" stroke="#B98F2C" stroke-width="3"/>
+  <path d="M250 172c8 8 62 8 80 0" stroke="#B98F2C" stroke-width="3" fill="none"/>
+  <path d="M443 172l14-14h56l14 14" stroke="#B98F2C" stroke-width="3" fill="none"/>
+  <text class="t" x="42" y="240">Bıçak sırtı</text><text class="l" x="42" y="255">metal kron · az madde kaybı</text>
+  <text class="t" x="240" y="240">Chamfer</text><text class="l" x="240" y="255">metal-seramik · en yaygın</text>
+  <text class="t" x="436" y="240">Basamak (shoulder)</text><text class="l" x="436" y="255">tam seramik · 0,8–1,2 mm</text>
+  <text class="l" x="42" y="60">Turuncu çizgi: bitim çizgisi (finish line) — ölçüde net okunmalıdır.</text></svg>`},
+
+  layers:{cap:"Şekil — Metal destekli porselende tabaka sırası",svg:`<svg viewBox="0 0 620 260"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 12px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  <path d="M120 200V96c0-30 20-48 55-48s55 18 55 48v104z" fill="#8A8F98" stroke="#141C2B" stroke-width="1.5"/>
+  <path d="M112 200V92c0-34 24-54 63-54s63 20 63 54v108z" fill="none" stroke="#141C2B"/>
+  <path d="M105 200V88c0-38 28-60 70-60s70 22 70 60v112z" fill="#F3E4D6" opacity=".85" stroke="#141C2B"/>
+  <path d="M98 200V84c0-42 32-66 77-66s77 24 77 66v116z" fill="#FBF8F1" opacity=".55" stroke="#141C2B"/>
+  <g stroke="#5A6880" stroke-dasharray="3 3"><path d="M175 70h150M175 55h150M175 40h150M175 25h150"/></g>
+  <text class="t" x="332" y="30">Glazür</text><text class="l" x="332" y="44">yüzey parlaklığı, plak tutulumunu azaltır</text>
+  <text class="t" x="332" y="60">Mine (incisal)</text><text class="l" x="332" y="74">saydamlık verir</text>
+  <text class="t" x="332" y="90">Dentin (body)</text><text class="l" x="332" y="104">rengin gövdesi</text>
+  <text class="t" x="332" y="120">Opak</text><text class="l" x="332" y="134">metalin grisini örter, bağlantıyı kurar</text>
+  <text class="t" x="332" y="150">Metal altyapı</text><text class="l" x="332" y="164">0,3–0,5 mm · oksit tabakası şart</text>
+  <text class="l" x="60" y="235">Isıl genleşme katsayıları uyumsuzsa porselen soğurken çatlar.</text></svg>`},
+
+  implant:{cap:"Şekil — İmplant üstü kron bileşenleri",svg:`<svg viewBox="0 0 620 300"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 12px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  <rect x="120" y="150" width="290" height="120" fill="#EDE7DA"/><path d="M120 150h290" stroke="#C0687A" stroke-width="8"/>
+  <path d="M240 150V95c0-26 12-40 30-40s30 14 30 40v55z" fill="#FBF8F1" stroke="#141C2B" stroke-width="1.6"/>
+  <path d="M252 150v-28c0-10 6-16 18-16s18 6 18 16v28z" fill="#F0E7D6" stroke="#B98F2C" stroke-width="1.4"/>
+  <path d="M254 152h32l-5 90c-1 12-21 12-22 0z" fill="#9AA1AC" stroke="#141C2B" stroke-width="1.4"/>
+  <g stroke="#141C2B" stroke-width=".8" opacity=".6"><path d="M256 168h28M257 182h26M258 196h24M259 210h22M260 224h20"/></g>
+  <path d="M270 108v130" stroke="#B98F2C" stroke-width="3" stroke-dasharray="5 3"/>
+  <g stroke="#5A6880" stroke-dasharray="3 3"><path d="M300 80h110M300 128h110M300 200h110"/></g>
+  <text class="t" x="416" y="76">Üst yapı (kron)</text><text class="l" x="416" y="90">simante veya vida tutuculu</text>
+  <text class="t" x="416" y="124">Abutment / dayanak</text><text class="l" x="416" y="138">açılı veya düz, tornalanabilir</text>
+  <text class="t" x="416" y="196">Fikstür (implant gövdesi)</text><text class="l" x="416" y="210">titanyum · kemikle osseointegre</text>
+  <text class="l" x="120" y="290">Altın kesik çizgi: bağlantı vidası. Vida sıkma torku üretici değerinde olmalıdır.</text></svg>`},
+
+  fdi:{cap:"Şekil — FDI iki haneli diş numaralandırma sistemi",svg:`<svg viewBox="0 0 620 260"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.n{font:600 11px 'IBM Plex Mono',monospace;fill:#141C2B}.t{font:700 13px 'Bricolage Grotesque',sans-serif;fill:#9E4E5F}</style></defs>
+  <line x1="310" y1="20" x2="310" y2="240" stroke="#D6D0C2" stroke-dasharray="5 4"/><line x1="60" y1="130" x2="560" y2="130" stroke="#D6D0C2" stroke-dasharray="5 4"/>
+  <g id="q"></g>
+  <text class="t" x="150" y="40">1. çeyrek (sağ üst)</text><text class="t" x="380" y="40">2. çeyrek (sol üst)</text>
+  <text class="t" x="150" y="232">4. çeyrek (sağ alt)</text><text class="t" x="380" y="232">3. çeyrek (sol alt)</text>
+  <g fill="#FBF8F1" stroke="#141C2B" stroke-width="1.1">
+  ${[...Array(8)].map((_,i)=>`<rect x="${290-i*30}" y="60" width="24" height="28" rx="5"/>`).join("")}
+  ${[...Array(8)].map((_,i)=>`<rect x="${306+i*30}" y="60" width="24" height="28" rx="5"/>`).join("")}
+  ${[...Array(8)].map((_,i)=>`<rect x="${290-i*30}" y="150" width="24" height="28" rx="5"/>`).join("")}
+  ${[...Array(8)].map((_,i)=>`<rect x="${306+i*30}" y="150" width="24" height="28" rx="5"/>`).join("")}</g>
+  <g class="n" text-anchor="middle">
+  ${[...Array(8)].map((_,i)=>`<text x="${302-i*30}" y="79">1${i+1}</text>`).join("")}
+  ${[...Array(8)].map((_,i)=>`<text x="${318+i*30}" y="79">2${i+1}</text>`).join("")}
+  ${[...Array(8)].map((_,i)=>`<text x="${302-i*30}" y="169">4${i+1}</text>`).join("")}
+  ${[...Array(8)].map((_,i)=>`<text x="${318+i*30}" y="169">3${i+1}</text>`).join("")}</g>
+  <text class="l" x="60" y="118">İlk hane çeyreği, ikinci hane orta hattan itibaren dişin sırasını verir. Örnek: 26 = sol üst 1. büyük azı.</text></svg>`},
+
+  autoclave:{cap:"Şekil — Buharlı sterilizasyonda (otoklav) tipik döngü",svg:`<svg viewBox="0 0 620 260"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 12px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  <line x1="70" y1="200" x2="580" y2="200" stroke="#141C2B"/><line x1="70" y1="30" x2="70" y2="200" stroke="#141C2B"/>
+  <path d="M70 195 L120 190 L150 170 L170 120 L200 60 L390 60 L420 120 L470 175 L560 190" fill="none" stroke="#C0687A" stroke-width="3"/>
+  <path d="M200 60h190v-1" stroke="#B98F2C" stroke-width="7" opacity=".35"/>
+  <g stroke="#D6D0C2" stroke-dasharray="3 3"><path d="M70 60h510M70 120h510"/></g>
+  <text class="l" x="20" y="64">134°C</text><text class="l" x="20" y="124">121°C</text><text class="l" x="24" y="204">0</text>
+  <text class="t" x="230" y="48">Sterilizasyon platosu</text><text class="l" x="230" y="90">134°C · 2,1 bar · en az 3–4 dk</text>
+  <text class="l" x="120" y="224">ön vakum</text><text class="l" x="270" y="224">ısınma → plato</text><text class="l" x="450" y="224">kurutma</text>
+  <text class="l" x="70" y="248">Her döngüde kimyasal indikatör, düzenli aralıklarla biyolojik indikatör (spor testi) kullanılır.</text></svg>`},
+
+  facial:{cap:"Şekil — Maksiller defektte obtüratör protezin işlevi",svg:`<svg viewBox="0 0 620 280"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 12px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  <path d="M180 40h260v70c0 40-20 60-60 60H240c-40 0-60-20-60-60z" fill="#EDE7DA" stroke="#141C2B" stroke-width="1.4"/>
+  <path d="M300 40v60c0 20 15 30 40 30h100" fill="none" stroke="#9E4E5F" stroke-width="2" stroke-dasharray="5 4"/>
+  <ellipse cx="360" cy="95" rx="55" ry="42" fill="#fff" stroke="#9E4E5F" stroke-width="2"/>
+  <text class="t" x="330" y="92">Defekt</text><text class="l" x="316" y="108">rezeksiyon boşluğu</text>
+  <path d="M180 170h260v26c0 14-12 22-30 22H210c-18 0-30-8-30-22z" fill="#C0687A" opacity=".55" stroke="#9E4E5F"/>
+  <path d="M320 172c30 0 46-14 46-40" fill="none" stroke="#B98F2C" stroke-width="6" stroke-linecap="round"/>
+  <text class="t" x="455" y="140">Obtüratör bulbu</text><text class="l" x="455" y="156">boşluğu kapatır, içi boş = hafif</text>
+  <text class="t" x="455" y="186">Protez kaidesi</text><text class="l" x="455" y="202">konuşma ve yutmayı düzeltir</text>
+  <text class="l" x="60" y="252">Amaç: ağız–burun bağlantısını kapatarak hipernazal konuşmayı ve sıvı kaçışını önlemek.</text></svg>`},
+
+  gypsum:{cap:"Şekil — Alçı tiplerinin su/toz oranı ve sertliği",svg:`<svg viewBox="0 0 620 250"><defs><style>.l{font:11px 'IBM Plex Mono',monospace;fill:#5A6880}.t{font:600 12px 'Bricolage Grotesque',sans-serif;fill:#141C2B}</style></defs>
+  ${[["Tip II · Model alçısı","50 / 100 ml","9",".28"],["Tip III · Sert alçı","28–30 / 100","20",".5"],["Tip IV · Ekstra sert (die)","19–24 / 100","35",".75"],["Tip V · Yüksek genleşmeli","18–22 / 100","40","1"]].map((r,i)=>`
+  <g transform="translate(0,${18+i*52})">
+   <text class="t" x="20" y="16">${r[0]}</text><text class="l" x="20" y="32">su/toz: ${r[1]}</text>
+   <rect x="250" y="2" width="320" height="20" rx="6" fill="#EDE7DA"/>
+   <rect x="250" y="2" width="${320*parseFloat(r[3])}" height="20" rx="6" fill="#B98F2C" opacity=".8"/>
+   <text class="l" x="250" y="36">basma dayanımı ≈ ${r[2]} MPa</text>
+  </g>`).join("")}
+  <text class="l" x="20" y="240">Su oranı arttıkça gözeneklilik artar, dayanım düşer. Die alçısında en düşük su kullanılır.</text></svg>`}
+};
+function figure(k){ const f=FIG[k]; return f? `<figure class="figure">${f.svg}<figcaption>${f.cap}</figcaption></figure>` : ""; }
+/* =====================================================================
+   MODÜL İÇERİKLERİ
+   ===================================================================== */
+const MODULES = [
+{
+ id:"m1", code:"A1", tag:"Hareketli Protez", title:"Hareketli Protez ve Uygulamaları-I",
+ sub:"Total protezin temelleri: destek dokular, ölçü, model, kaide ve diş dizimi.",
+ sections:[
+  {h:"Hareketli protez nedir, nasıl sınıflandırılır?", body:`
+   <p>Hareketli protez, hasta tarafından ağza takılıp çıkarılabilen; kaybedilen dişleri ve çevresindeki yumuşak-sert dokuları yerine koyan protez türüdür. Sabit protezden farkı, kuvvetin yalnızca dişlerden değil, büyük ölçüde <b>dişeti ve altındaki kemikten</b> karşılanmasıdır.</p>
+   <h4>Ana gruplar</h4>
+   <ul>
+    <li><b>Total (tam) protez:</b> Bir çenede hiç diş kalmadığında uygulanır. Tutuculuğunu emme (adezyon-kohezyon), atmosfer basıncı ve kas dengesinden alır.</li>
+    <li><b>Bölümlü (parsiyel) protez:</b> Ağızda bir kısım diş varken uygulanır. Akrilik kaideli ya da metal iskeletli olabilir.</li>
+    <li><b>İmmediat protez:</b> Dişler çekilmeden önce hazırlanan, çekim seansında takılan protez.</li>
+    <li><b>Overdenture:</b> Kalan kök veya implantların üzerine oturan, tutuculuğu artırılmış protez.</li>
+   </ul>
+   <h4>Protezden beklenenler</h4>
+   <p>Bir protez dört başlıkta değerlendirilir: <b>destek</b> (dikey kuvvetlere direnç), <b>tutuculuk</b> (dikey yönde yerinden çıkmaya direnç), <b>stabilite</b> (yatay kayma ve dönmeye direnç) ve <b>estetik-fonasyon</b> (görünüm ve konuşma). Teknisyenin her laboratuvar aşamasındaki kararı bu dört ölçütten en az birini etkiler.</p>`},
+  {h:"Total protezde anatomik sınırlar ve destek bölgeleri", fig:"denture", body:`
+   <p>Total protezin başarısı, kaidenin doğru anatomik sınırlara uzanmasına bağlıdır. Kısa biten kenar tutuculuğu düşürür; fazla uzayan kenar ise hareketli dokulara çarparak protezin oynamasına ve yaraya yol açar.</p>
+   <h4>Üst çene</h4>
+   <ul>
+    <li><b>Sert damak ve alveol kreti:</b> Birincil destek alanlarıdır; çiğneme kuvvetini taşır.</li>
+    <li><b>Postpalatinal kapanma (post-dam) alanı:</b> Sert damağın yumuşak damağa geçtiği bölgedir; buradaki hafif baskı vakumu tamamlar.</li>
+    <li><b>Tüber maksilla:</b> Arka bölgede tutuculuğa ve stabiliteye katkı verir.</li>
+    <li>Kaçınılması gerekenler: orta hattaki <b>torus palatinus</b> ve keskin kemik çıkıntıları rahatlatılır.</li>
+   </ul>
+   <h4>Alt çene</h4>
+   <p>Alt total protez, destek alanı üst çeneden çok daha küçük olduğu için daha zordur. <b>Retromolar ped</b> arka sınırı belirler ve protezin buraya kadar uzatılması gerekir. Dil, yanak ve dudak kasları protezi sürekli hareket ettirmeye çalışır; bu nedenle kaide kenarları kas hareketine uyumlu (fonksiyonel) biçimlendirilir.</p>
+   <p>Ağız tabanı, frenulumlar ve mylohyoid çizgi gibi hareketli/keskin bölgelerde kaide uygun biçimde çentiklenir. Bu bölgelerin ölçü ve model üzerinde doğru okunması, teknisyenin ilk sorumluluğudur.</p>`,
+   quiz:[
+    {q:"Üst total protezde vakumun tamamlanmasını sağlayan, sert damak ile yumuşak damak arasındaki bölge hangisidir?",o:["Tüber maksilla","Postpalatinal kapanma alanı","Torus palatinus","Retromolar ped"],a:1,why:"Post-dam alanına verilen kontrollü baskı, hava kaçışını engelleyerek emmeyi güçlendirir."},
+    {q:"Alt total protezin arka sınırını belirleyen anatomik yapı hangisidir?",o:["Retromolar ped","Frenulum labialis","Sert damak","Alveol tüberkülü"],a:0,why:"Alt protez retromolar pedi örtecek biçimde uzatılır; kısa kalırsa stabilite azalır."},
+    {q:"Protezin yatay kayma ve dönme hareketlerine direnç göstermesine ne ad verilir?",o:["Destek","Tutuculuk","Stabilite","Adezyon"],a:2,why:"Stabilite fonksiyon sırasındaki yer değiştirmeye karşı direnci ifade eder."}
+   ]},
+  {h:"Ölçü, model ve bireysel kaşık", fig:"gypsum", body:`
+   <p>Total protezde iki aşamalı ölçü yaklaşımı standarttır.</p>
+   <h4>1. Anatomik (ön) ölçü</h4>
+   <p>Hazır kaşıkla, çoğunlukla <b>aljinat</b> ile alınır. Amaç, bireysel kaşığın üzerinde hazırlanacağı çalışma modelini elde etmektir. Aljinat boyutsal olarak kararsızdır: ölçü <b>en geç 15 dakika içinde</b> dökülmeli, bekletilecekse %100 nemli ortamda saklanmalıdır.</p>
+   <h4>2. Bireysel kaşık ve fonksiyonel ölçü</h4>
+   <p>Ön model üzerinde, sınırlar 2 mm kısa bırakılarak akrilik veya ışıkla sertleşen plaktan bireysel kaşık hazırlanır. Kenarlar <b>yeşil kompaund (border molding)</b> ile kas hareketlerine göre şekillendirilir, ardından çinko-oksit öjenol veya elastomer ile son ölçü alınır.</p>
+   <h4>Model dökümü</h4>
+   <ul>
+    <li>Alçı, üretici oranında ve <b>toz suyun üzerine serpilerek</b> hazırlanır; vakumlu karıştırıcı hava kabarcığını azaltır.</li>
+    <li>Ölçü vibratör üzerinde, tek noktadan akıtılarak doldurulur; böylece hava sıkışması önlenir.</li>
+    <li>Model tabanı en az 10–12 mm kalınlıkta olmalıdır.</li>
+    <li>Sertleşme sırasında ısı açığa çıkar (ekzotermik); alçı tam sertleşmeden model çıkarılmaz.</li>
+   </ul>`},
+  {h:"Kaide plağı, mum duvar, artikülasyon ve diş dizimi", body:`
+   <p>Model hazırlandıktan sonra çene ilişkisinin belirlenmesi için <b>kaide plağı ve mum duvar</b> hazırlanır. Kaide plağı model üzerinde oynamayacak kadar sıkı, mum duvar ise hastanın dudak desteğini ve dikey boyutunu taşıyacak ölçülerde olur.</p>
+   <h4>Ortalama mum duvar ölçüleri</h4>
+   <ul>
+    <li>Üst ön bölge yüksekliği: kretten yaklaşık <b>22 mm</b>, genişlik 4–6 mm.</li>
+    <li>Alt ön bölge yüksekliği: yaklaşık <b>18 mm</b>.</li>
+    <li>Ön bölge kesici kenarı, üst dudak hizasında ve kamburluk oluşturacak biçimde ayarlanır.</li>
+   </ul>
+   <h4>Artikülatöre alma</h4>
+   <p>Üst model <b>yüz arkı</b> (face-bow) kaydı ile kafatası referanslarına göre, alt model ise merkezi ilişki kaydı ile bağlanır. Yanlış artikülasyon, ağızda düzeltilemeyen kapanış hataları doğurur.</p>
+   <h4>Diş dizimi ilkeleri</h4>
+   <ul>
+    <li>Ön dişler <b>estetik ve fonasyona</b>, arka dişler <b>fonksiyona</b> göre dizilir.</li>
+    <li>Arka dişler kretin tepesini izleyen çizgi üzerine yerleştirilir; kretten dışarı taşan diziliş protezi devirir.</li>
+    <li>Dengeli oklüzyon: çene hangi yöne kayarsa kaysın karşılıklı temasların sürmesi hedeflenir.</li>
+    <li>Kompanzasyon eğrileri (Spee ve Wilson) protezin denge temaslarını sağlar.</li>
+   </ul>
+   <p>Prova sonrası protez muflaya alınır, mum atımı yapılır, akrilik tepilir ve polimerizasyon sonrası tesviye-polisaj ile bitirilir.</p>`,
+   quiz:[
+    {q:"Aljinat ölçünün en geç ne kadar sürede dökülmesi önerilir?",o:["15 dakika","2 saat","24 saat","Süre önemli değildir"],a:0,why:"Aljinat su kaybederek büzülür (sinerezis), su alarak şişer (imbibisyon); bekletmek boyutsal hataya yol açar."},
+    {q:"Bireysel kaşığın kenarlarının kas hareketlerine göre şekillendirilmesi işlemi nedir?",o:["Post-dam","Border molding (kenar şekillendirme)","Blockout","Relining"],a:1,why:"Kenar şekillendirme genellikle yeşil kompaund ile yapılır ve kenar bütünlüğünü sağlar."},
+    {q:"Total protezde arka dişlerin diziminde temel kural hangisidir?",o:["Mümkün olduğunca yanağa yakın dizilir","Kret tepesi çizgisi üzerine dizilir","Her zaman kretin iç tarafına dizilir","Ön dişlerle aynı hizada dizilir"],a:1,why:"Kret tepesinden sapan diziliş, protezi deviren kaldıraç kuvvetleri oluşturur."}
+   ]}
+ ],
+ match:{title:"Kavramı karşılığıyla eşleştir", pairs:[
+  ["Adezyon","Tükürüğün protez ile mukozaya yapışması"],
+  ["Kohezyon","Tükürük moleküllerinin birbirini çekmesi"],
+  ["Post-dam","Üst protezin arka kapanma alanı"],
+  ["Retromolar ped","Alt protezin arka sınırı"],
+  ["Torus palatinus","Damaktaki kemik çıkıntısı, rahatlatılır"],
+  ["Yüz arkı","Üst modelin artikülatöre doğru bağlanması"]
+ ]},
+ exam:[
+  {q:"Total protez hangi durumda uygulanır?",o:["Tek diş eksikliğinde","Çenede hiç diş kalmadığında","Sadece ön dişler eksikken","Diş çürüğü tedavisinde"],a:1,why:"Total protez tam dişsiz çenelerde uygulanır."},
+  {q:"Aşağıdakilerden hangisi üst total protezin birincil destek alanıdır?",o:["Frenulumlar","Sert damak ve alveol kreti","Yumuşak damak","Ağız tabanı"],a:1,why:"Çiğneme kuvvetini taşıyabilen sert dokular üzerindeki mukoza birincil destek alanıdır."},
+  {q:"Bireysel kaşığın kenarları, model üzerinde neden yaklaşık 2 mm kısa bitirilir?",o:["Akrilikten tasarruf için","Kenar şekillendirme maddesine yer bırakmak için","Kaşık daha hafif olsun diye","Hastanın ağzına kolay girsin diye"],a:1,why:"Kısa kenar, kompaundun fonksiyonel kalınlığı oluşturmasına olanak verir."},
+  {q:"Alçı karıştırılırken doğru uygulama hangisidir?",o:["Suyun tozun üzerine dökülmesi","Tozun suyun üzerine serpilmesi","Toz ve suyun aynı anda dökülmesi","Önce elle sonra makineyle su eklenmesi"],a:1,why:"Toz suya serpilerek eklenir; böylece homojen ıslanma sağlanır ve hava az kalır."},
+  {q:"Üst ön bölgede mum duvarın kretten ortalama yüksekliği nedir?",o:["10 mm","22 mm","30 mm","35 mm"],a:1,why:"Ortalama değer 22 mm'dir; hastaya göre dudak desteği ve gülme çizgisiyle uyarlanır."},
+  {q:"Protezin dikey yönde yerinden çıkmasına direnç göstermesi hangi kavramdır?",o:["Stabilite","Destek","Tutuculuk","Oklüzyon"],a:2,why:"Tutuculuk (retansiyon) protezi yerinde tutan kuvvetlerin toplamıdır."},
+  {q:"Aşağıdakilerden hangisi hareketli protez türü değildir?",o:["İmmediat protez","Overdenture","Bölümlü protez","Metal destekli kron"],a:3,why:"Kron sabit protez grubundadır."},
+  {q:"Dengeli oklüzyon ne anlama gelir?",o:["Yalnızca ön dişlerin temas etmesi","Çene hareketlerinde karşılıklı temasların sürmesi","Dişlerin hiç temas etmemesi","Sadece sağ tarafta temas olması"],a:1,why:"Dengeli oklüzyon protezin fonksiyon sırasında devrilmesini önler."}
+ ]
+},
+
+{
+ id:"m2", code:"A2", tag:"Maddeler Bilgisi", title:"Diş Hekimliğinde Maddeler Bilgisi",
+ sub:"Alçılar, ölçü maddeleri, mumlar, akrilikler, alaşımlar ve revetmanların özellikleri.",
+ sections:[
+  {h:"Maddelerin temel özellikleri", body:`
+   <p>Laboratuvarda seçilen her maddenin davranışı birkaç temel özellikle açıklanır. Bunları bilmek, hatanın nereden kaynaklandığını bulmayı sağlar.</p>
+   <ul>
+    <li><b>Boyutsal kararlılık:</b> Maddenin zamanla şekil ve ölçüsünü koruması. Ölçü maddelerinde en kritik özelliktir.</li>
+    <li><b>Isıl genleşme katsayısı:</b> Sıcaklıkla hacim değişimi. Metal-seramik uyumunda belirleyicidir.</li>
+    <li><b>Akıcılık ve ıslatabilirlik:</b> Maddenin ince ayrıntıya girebilmesi.</li>
+    <li><b>Elastik geri dönüş:</b> Ölçü maddesinin alt açıdan çıkarken deforme olup eski haline dönebilmesi.</li>
+    <li><b>Biyouyumluluk:</b> Dokuya zarar vermemesi; monomer artığı gibi kalıntılar tahriş yapar.</li>
+    <li><b>Basma dayanımı ve sertlik:</b> Model ve die maddelerinde aşınmaya direnç demektir.</li>
+   </ul>`},
+  {h:"Alçılar ve ölçü maddeleri", fig:"gypsum", body:`
+   <h4>Alçı tipleri</h4>
+   <ul>
+    <li><b>Tip I – İmpresyon alçısı:</b> Bugün nadiren kullanılır.</li>
+    <li><b>Tip II – Model (adi) alçısı:</b> Mufla dolumu ve destek modelleri.</li>
+    <li><b>Tip III – Sert alçı:</b> Hareketli protez çalışma modelleri.</li>
+    <li><b>Tip IV – Ekstra sert (die) alçı:</b> Sabit protezde day (die) hazırlığı; düşük genleşme, yüksek sertlik.</li>
+    <li><b>Tip V:</b> Yüksek genleşmeli, döküm büzülmesi fazla alaşımlarda tercih edilir.</li>
+   </ul>
+   <p>Su/toz oranı arttıkça sertleşme uzar, gözeneklilik artar ve dayanım düşer. Sertleşmeyi hızlandırmak için potasyum sülfat, yavaşlatmak için borat tuzları kullanılır. Sıcak su karışım süresini kısaltır.</p>
+   <h4>Ölçü maddeleri</h4>
+   <ul>
+    <li><b>Aljinat (irreversible hidrokolloid):</b> Ucuz, kolay; ancak boyutsal kararlılığı düşük, hemen dökülmeli.</li>
+    <li><b>Agar (reversible hidrokolloid):</b> Isı ile jel-sol dönüşümü, su soğutmalı sistem gerektirir.</li>
+    <li><b>Polivinil siloksan (A-silikon):</b> Yüksek doğruluk ve boyutsal kararlılık, hidrofobik yapısı geliştirilmiştir; sabit protezin altın standardı.</li>
+    <li><b>Polieter:</b> Çok hassas, hidrofilik, ancak sert olduğu için alt açılarda çıkarılması zordur.</li>
+    <li><b>Çinko-oksit öjenol:</b> Dişsiz çenede fonksiyonel ölçüde kullanılır, akıcıdır.</li>
+   </ul>`,
+   quiz:[
+    {q:"Sabit protezde day (die) hazırlığı için hangi alçı tipi kullanılır?",o:["Tip I","Tip II","Tip III","Tip IV"],a:3,why:"Tip IV ekstra sert alçı yüksek sertlik ve düşük genleşme sunar."},
+    {q:"A-silikon ölçü maddesinin en belirgin üstünlüğü nedir?",o:["Çok ucuz olması","Yüksek boyutsal kararlılık ve ayrıntı doğruluğu","Suda çözünmesi","Isı ile sertleşmesi"],a:1,why:"Polivinil siloksan uzun süre boyutunu korur, bu nedenle kron-köprü ölçülerinde tercih edilir."},
+    {q:"Alçının su/toz oranı artırılırsa ne olur?",o:["Dayanım artar","Sertleşme kısalır","Gözeneklilik artar, dayanım düşer","Genleşme tamamen durur"],a:2,why:"Fazla su, sertleşen kütlede boşluk bırakır."}
+   ]},
+  {h:"Mumlar, akrilikler ve polimerizasyon", body:`
+   <h4>Dental mumlar</h4>
+   <ul>
+    <li><b>İnley (modelaj) mumu:</b> Kron-köprü modelajında; düşük akma, keskin kenar verir.</li>
+    <li><b>Kaide (baz plak) mumu:</b> Mum duvar ve diş diziminde.</li>
+    <li><b>Yapıştırma (sticky) mumu:</b> Parçaların geçici birleştirilmesinde.</li>
+    <li><b>Döküm mumu:</b> Artık bırakmadan yanmalıdır; kalıntı külleşme dökümde kusur yapar.</li>
+   </ul>
+   <p>Mumların ısıl genleşmesi tüm dental maddeler arasında en yüksektir; bu yüzden modelaj oda sıcaklığında yapılmalı ve mum modelaj bekletilmeden revetmana alınmalıdır.</p>
+   <h4>Akrilik reçineler (PMMA)</h4>
+   <p>Toz (polimer) + likit (monomer) karışımı dört evreden geçer: <b>kumlu → ipliksi → hamur (tepme) → kauçuksu</b>. Tepme yalnızca hamur evresinde yapılır.</p>
+   <ul>
+    <li><b>Isı ile polimerize (ısı tepme):</b> En dayanıklı, artık monomeri en az olan gruptur.</li>
+    <li><b>Otopolimerizan (soğuk akrilik):</b> Tamir ve besleme için; artık monomeri daha yüksektir.</li>
+    <li><b>Işıkla sertleşen ve enjeksiyon sistemleri:</b> Daha az büzülme ve daha iyi uyum sağlar.</li>
+   </ul>
+   <p>Polimerizasyon <b>ekzotermiktir</b>. Hızlı ısıtma monomerin kaynamasına ve protez içinde <b>gözeneklilik</b> oluşmasına yol açar; bu nedenle kontrollü ve kademeli ısıtma uygulanır. Yetersiz polimerizasyon ise ağızda tahriş yapan artık monomer bırakır.</p>`},
+  {h:"Alaşımlar ve revetmanlar", body:`
+   <h4>Döküm alaşımları</h4>
+   <ul>
+    <li><b>Soy (asil) alaşımlar:</b> Altın esaslı; korozyona dayanıklı, işlenmesi kolay, pahalı.</li>
+    <li><b>Krom-kobalt:</b> Yüksek elastik modül ve sertlik; bölümlü protez iskeletlerinin standardı. İnce ve rijit iskelet yapılabilir.</li>
+    <li><b>Nikel-krom:</b> Metal-seramikte kullanılmıştır; nikel alerjisi riski nedeniyle sınırlanmıştır.</li>
+    <li><b>Titanyum:</b> Üstün biyouyumluluk, düşük yoğunluk; dökümü özel donanım ister.</li>
+   </ul>
+   <h4>Revetmanlar (döküm kalıp maddesi)</h4>
+   <p>Revetman, mum modelin yerine boşluk oluşturan ve erimiş metale dayanan kalıp maddesidir. Bağlayıcısına göre üçe ayrılır:</p>
+   <ul>
+    <li><b>Alçı bağlı:</b> Düşük ısılı altın alaşımları için (yaklaşık 700°C'ye kadar).</li>
+    <li><b>Fosfat bağlı:</b> Krom-kobalt ve metal-seramik alaşımları için; yüksek ısıya dayanır.</li>
+    <li><b>Silika bağlı:</b> Özellikle iskelet dökümünde kullanılır.</li>
+   </ul>
+   <p>Metal soğurken büzülür. Bu büzülme, revetmanın <b>sertleşme genleşmesi + higroskopik genleşme + ısıl genleşmesi</b> ile telafi edilir. Denge kurulamazsa kron ya sıkı ya da boşluklu olur.</p>`,
+   quiz:[
+    {q:"Akrilik hangi evrede muflaya tepilir?",o:["Kumlu evre","İpliksi evre","Hamur evresi","Kauçuksu evre"],a:2,why:"Hamur evresinde akrilik ele yapışmaz ve şekil verilebilir."},
+    {q:"Krom-kobalt alaşımının bölümlü protez iskeletinde tercih edilme nedeni nedir?",o:["Düşük ergime ısısı","Yüksek rijitlik ve elastik modül","Ucuz olması ve kolay lehimlenmesi","Şeffaf olması"],a:1,why:"Yüksek elastik modül, ince kesitle rijit iskelete olanak verir."},
+    {q:"Krom-kobalt dökümünde hangi revetman kullanılır?",o:["Alçı bağlı","Fosfat bağlı","Aljinat bağlı","Mum bağlı"],a:1,why:"Yüksek döküm ısısı nedeniyle fosfat bağlı revetman gerekir."}
+   ]}
+ ],
+ match:{title:"Maddeyi kullanım alanıyla eşleştir", pairs:[
+  ["Tip IV alçı","Sabit protezde day (die) modeli"],
+  ["Aljinat","Ön (anatomik) ölçü"],
+  ["Polivinil siloksan","Hassas kron-köprü ölçüsü"],
+  ["Yapışkan mum","Parçaların geçici birleştirilmesi"],
+  ["Fosfat bağlı revetman","Krom-kobalt dökümü"],
+  ["Otopolimerizan akrilik","Protez tamiri ve besleme"]
+ ]},
+ exam:[
+  {q:"Ölçü maddelerinde en kritik özellik hangisidir?",o:["Renk","Boyutsal kararlılık","Koku","Ambalaj tipi"],a:1,why:"Ölçü, ağzın birebir kopyasıdır; boyut değişimi tüm işi bozar."},
+  {q:"Aljinatın su kaybederek büzülmesine ne ad verilir?",o:["İmbibisyon","Sinerezis","Polimerizasyon","Sinterleme"],a:1,why:"Sinerezis su kaybı, imbibisyon ise su emilimidir."},
+  {q:"Alçının sertleşmesini hızlandırmak için ne kullanılır?",o:["Borat tuzları","Potasyum sülfat","Buzlu su","Gliserin"],a:1,why:"Potasyum sülfat hızlandırıcı, borat geciktiricidir."},
+  {q:"Isı ile polimerize akriliğin otopolimerizana üstünlüğü nedir?",o:["Daha çabuk hazırlanır","Artık monomeri daha azdır","Renk seçimi daha fazladır","Isı gerektirmez"],a:1,why:"Daha tam polimerizasyon, daha az artık monomer ve daha yüksek dayanım demektir."},
+  {q:"Akrilikte gözeneklilik (poroziteler) en sık hangi hatadan doğar?",o:["Çok yavaş ısıtma","Ani ve aşırı ısıtma sonucu monomerin kaynaması","Fazla polisaj","Modelin ıslak olması"],a:1,why:"Monomer yaklaşık 100°C'de kaynar; kontrolsüz ısı gaz kabarcığı bırakır."},
+  {q:"Metalin soğurken oluşan büzülmesi neyle telafi edilir?",o:["Mumun genleşmesiyle","Revetmanın genleşmesiyle","Alçının sertleşmesiyle","Polisaj ile"],a:1,why:"Revetmanın sertleşme, higroskopik ve ısıl genleşmeleri büzülmeyi karşılar."},
+  {q:"Aşağıdaki mumlardan hangisi kron-köprü modelajında kullanılır?",o:["Kaide mumu","İnley (modelaj) mumu","Yapışkan mum","Ütü mumu"],a:1,why:"İnley mumu düşük akma ve keskin kenar özelliği verir."},
+  {q:"Titanyumun en belirgin özelliği hangisidir?",o:["Düşük biyouyumluluk","Üstün biyouyumluluk ve düşük yoğunluk","Çok yüksek yoğunluk","Suda çözünürlük"],a:1,why:"Titanyum, implantolojinin temel malzemesidir."}
+ ]
+},
+
+{
+ id:"m3", code:"A3", tag:"Sabit Protez", title:"Sabit Protez ve Uygulamaları-I",
+ sub:"Kron ve köprünün temelleri: preparasyon, day, mum modelaj, revetman ve döküm.",
+ sections:[
+  {h:"Sabit protez türleri ve endikasyonları", body:`
+   <p>Sabit protez, hastanın çıkaramadığı; doğal dişe veya implanta simante edilen restorasyondur.</p>
+   <ul>
+    <li><b>İnley / onley:</b> Diş içi veya tüberkülleri de örten parçalar.</li>
+    <li><b>Tam kron:</b> Dişin tüm klinik kronunu örter. Metal, metal-seramik veya tam seramik olabilir.</li>
+    <li><b>Post-kor:</b> Kanal tedavili, aşırı madde kaybı olan dişte üstyapıya dayanak oluşturur.</li>
+    <li><b>Köprü:</b> Eksik dişin iki yanındaki <b>dayanak dişlere</b> tutunan, aradaki boşluğu <b>gövde (pontik)</b> ile kapatan sabit restorasyon.</li>
+   </ul>
+   <h4>Köprünün parçaları</h4>
+   <p>Köprü üç öğeden oluşur: <b>retainer</b> (dayanak dişteki kron), <b>pontik</b> (eksik dişin yerini alan gövde) ve <b>bağlayıcı</b> (ikisini birleştiren bölge). Ante kuralı gereği, dayanak dişlerin kök yüzey alanı, karşılanacak eksik dişlerinkine en az eşit olmalıdır.</p>
+   <h4>Pontik tasarımı</h4>
+   <p>Pontiğin krete bakan yüzü <b>temizlenebilir</b> olmalıdır. En sık kullanılan tipler: hijyenik (krete temas etmeyen), modifiye ridge-lap (estetik bölgede, sınırlı temas) ve ovat (yumuşak dokuya gömülü, en estetik).</p>`},
+  {h:"Preparasyon ilkeleri ve bitim çizgileri", fig:"crown", body:`
+   <p>Preparasyon, dişin restorasyona yer açmak için aşındırılmasıdır. Teknisyen preparasyonu okuyabilmelidir; çünkü restorasyonun kalınlığı ve sınırları buna bağlıdır.</p>
+   <h4>Temel kurallar</h4>
+   <ul>
+    <li><b>Yeterli aşındırma:</b> Metal kron için 0,5 mm, metal-seramik için 1,2–1,5 mm, tam seramik için 1,0–2,0 mm alan gerekir. Yetersiz alan, kalınlığı düşük ve kırılgan restorasyon demektir.</li>
+    <li><b>Konikliğe uygun duvarlar:</b> Duvarlar arasında yaklaşık 6°'lik toplam koniklik, hem yerleştirmeye hem tutuculuğa uygundur. Aşırı koniklik tutuculuğu düşürür.</li>
+    <li><b>Alt açı (undercut) bulunmamalı;</b> tek yönde çıkış yolu olmalıdır.</li>
+    <li><b>Keskin köşeler yuvarlatılır;</b> stres yığılması ve seramik çatlağı önlenir.</li>
+   </ul>
+   <h4>Bitim çizgisi seçimi</h4>
+   <ul>
+    <li><b>Bıçak sırtı (knife-edge):</b> Az madde kaybı, ancak sınır okunması zordur. Metal kronlarda.</li>
+    <li><b>Chamfer:</b> Yuvarlak geçiş; metal ve metal-seramik kronlarda en yaygın seçim.</li>
+    <li><b>Basamak (shoulder):</b> 90°'ye yakın, 0,8–1,2 mm; tam seramikte porselene yeterli kalınlık verir.</li>
+   </ul>`,
+   quiz:[
+    {q:"Metal-seramik kron için gereken ortalama oklüzal aşındırma miktarı nedir?",o:["0,2 mm","0,5 mm","1,2–1,5 mm","3 mm"],a:2,why:"Metal altyapı + opak + porselen katmanları için bu kalınlık gerekir."},
+    {q:"Tam seramik restorasyonlarda en uygun bitim çizgisi hangisidir?",o:["Bıçak sırtı","Basamak (shoulder)","Sınır gerekmez","Ters eğim"],a:1,why:"Basamak, seramiğe destek veren düz ve yeterli kalınlıkta bir taban sağlar."},
+    {q:"Preparasyonda alt açı (undercut) bulunması neye yol açar?",o:["Daha iyi tutuculuk","Restorasyonun yerine oturmaması","Daha iyi estetik","Simanın daha iyi tutması"],a:1,why:"Tek çıkış yolu olmadığında restorasyon dişe oturmaz."}
+   ]},
+  {h:"Model, day hazırlığı ve mum modelaj", body:`
+   <h4>Day (die) sistemi</h4>
+   <p>Sabit protezde her dayanak diş, tek tek çıkarılabilen bir <b>day</b> olarak hazırlanır. En yaygın yöntem <b>pinli (Pindex) sistemdir</b>: ölçü tip IV alçı ile dökülür, kesilecek segmentlere pin yerleştirilir, taban dökülüp testereyle ayrılır.</p>
+   <ul>
+    <li>Day'in <b>bitim çizgisi</b> bistüri ile açığa çıkarılır, ancak sınır asla aşındırılmaz.</li>
+    <li>Bitim çizgisinin altı hafifçe daraltılır (ditching) ki mum kenarı net görünsün.</li>
+    <li><b>Die spacer</b> (aralık vernisi) siman için 20–40 µm boşluk bırakır; bitim çizgisine 0,5–1 mm kala uygulanmaz.</li>
+   </ul>
+   <h4>Mum modelaj</h4>
+   <p>Damlatma tekniğiyle yapılır: önce iç yüzey ve eksen duvarlar, sonra tüberkül tepeleri, en son fissür ve kenar sırtları oluşturulur. Modelajda hedef, karşı dişle uyumlu temas ve doğru komşuluk ilişkisidir.</p>
+   <ul>
+    <li>Metal-seramik altyapısında mum kalınlığı <b>0,3–0,5 mm</b>, porselene destek verecek biçimde anatomik olmalıdır.</li>
+    <li>Porselen alanında keskin açı bırakılmaz; destek eksikse porselen kırılır.</li>
+    <li>Komşu temas noktası, diş ipinin hafif direnç ile geçebileceği sıkılıkta olur.</li>
+   </ul>`},
+  {h:"Tijleme, revetman, döküm ve uyumlama", body:`
+   <h4>Tijleme (spruing)</h4>
+   <p>Tij, erimiş metalin kalıba akış yoludur ve soğuma sırasında besleme görevi görür.</p>
+   <ul>
+    <li>Tij, mum modelin <b>en kalın bölgesine</b> bağlanır.</li>
+    <li>Keskin dönüş yapılmaz; akış türbülans oluşturmayacak biçimde yumuşak açıyla yönlendirilir.</li>
+    <li>Model, silindirin <b>ısı merkezinden</b> uzağa ve üst yüzeye 6 mm mesafeye yerleştirilir.</li>
+   </ul>
+   <h4>Revetmana alma ve mum atımı</h4>
+   <p>Mum modele yüzey gerilimini düşüren ıslatıcı sürülür, revetman vakumda karıştırılıp vibrasyonla dökülür. Fırında kademeli ısıtma ile mum tamamen uzaklaştırılır (burn-out); erken ve hızlı ısıtma kalıbı çatlatır.</p>
+   <h4>Döküm ve sonrası</h4>
+   <ul>
+    <li>Santrifüj veya vakum-basınç döküm makinesiyle metal kalıba gönderilir.</li>
+    <li>Silindir <b>oda sıcaklığında</b> soğutulur; ani soğutma iç gerilim ve çatlak bırakır.</li>
+    <li>Revetman temizlenir, alüminyum oksit ile kumlanır, tij kesilir.</li>
+    <li>Day üzerinde uyum kontrol edilir; erken temaslar okluzyon spreyi ile bulunup düzeltilir.</li>
+   </ul>
+   <p><b>Sık döküm kusurları:</b> Yuvarlak pürüzler → revetmanda hava kabarcığı. Eksik döküm → düşük metal ısısı veya yetersiz basınç. Kanatçık (fin) → kalıp çatlağı. Karartı ve yüzey pürüzü → yetersiz burn-out.</p>`,
+   quiz:[
+    {q:"Die spacer (aralık vernisi) neden uygulanır?",o:["Mumun yapışmasını sağlamak için","Siman için boşluk bırakmak için","Alçıyı sertleştirmek için","Rengi kontrol etmek için"],a:1,why:"20–40 µm'lik boşluk, restorasyonun siman filmiyle tam oturmasını sağlar."},
+    {q:"Tij mum modelin neresine bağlanır?",o:["En ince bölgesine","En kalın bölgesine","Bitim çizgisine","Komşu temas noktasına"],a:1,why:"Soğuma sırasında beslemenin sürmesi için en kalın bölge seçilir."},
+    {q:"Döküm yüzeyinde yuvarlak çıkıntılar (boncuklar) görülmesinin nedeni nedir?",o:["Revetmanda hava kabarcığı kalması","Metalin çok soğuk olması","Fazla polisaj","Mumun ince olması"],a:0,why:"Hava kabarcıkları kalıpta boşluk bırakır, metal buraya dolarak boncuk oluşturur."}
+   ]}
+ ],
+ match:{title:"Terimi tanımıyla eşleştir", pairs:[
+  ["Pontik","Köprüde eksik dişin yerini alan gövde"],
+  ["Retainer","Dayanak dişe simante edilen kron"],
+  ["Chamfer","Yuvarlak geçişli bitim çizgisi"],
+  ["Pindex","Pinli day hazırlama sistemi"],
+  ["Burn-out","Kalıptan mumun ısıyla uzaklaştırılması"],
+  ["Ante kuralı","Dayanak köklerinin yüzey alanı ölçütü"]
+ ]},
+ exam:[
+  {q:"Köprüde dayanak dişe simante edilen parça hangisidir?",o:["Pontik","Retainer","Bağlayıcı","Day"],a:1,why:"Retainer köprüyü dişe bağlayan kron kısmıdır."},
+  {q:"Preparasyon duvarlarında önerilen toplam koniklik yaklaşık kaç derecedir?",o:["0°","6°","25°","45°"],a:1,why:"Yaklaşık 6°, tutuculuk ile yerleştirilebilirlik arasında dengeyi sağlar."},
+  {q:"Metal-seramik altyapıda metal kalınlığı ne olmalıdır?",o:["0,05 mm","0,3–0,5 mm","1,5 mm","2,5 mm"],a:1,why:"Bu kalınlık rijitlik sağlarken porselene yer bırakır."},
+  {q:"Aşağıdakilerden hangisi en kolay temizlenen pontik tipidir?",o:["Ovat pontik","Hijyenik (sanitary) pontik","Ridge-lap pontik","Konik pontik"],a:1,why:"Krete temas etmediği için altından temizlik yapılabilir."},
+  {q:"Silindirin döküm sonrası ani soğutulması neye yol açar?",o:["Daha iyi uyum","İç gerilim ve çatlak","Daha parlak yüzey","Daha az büzülme"],a:1,why:"Hızlı soğuma metalde ve revetmanda gerilim bırakır."},
+  {q:"Yetersiz burn-out sonucu ne görülür?",o:["Kalıpta mum artığı ve yüzey kusuru","Daha ince döküm","Renk değişimi olmaz","Metal daha akıcı olur"],a:0,why:"Yanmayan mum artığı, kalıp yüzeyini bozar ve gaz sıkışması yapar."},
+  {q:"Day üzerinde bitim çizgisinin altının hafifçe daraltılmasına ne denir?",o:["Ditching (kenar açma)","Blockout","Sprue","Glaze"],a:0,why:"Sınırın net görünmesini sağlar; ancak sınırın kendisine dokunulmaz."},
+  {q:"Komşu temas noktası nasıl olmalıdır?",o:["Tamamen açık","Diş ipinin hafif dirençle geçeceği sıkılıkta","Çok sıkı, ip geçmemeli","Rastgele"],a:1,why:"Açık temas gıda sıkışması, çok sıkı temas ise dişte ağrı yapar."}
+ ]
+},
+
+{
+ id:"m4", code:"A3.5", tag:"Diş Morfolojisi", title:"Diş Morfolojisi ve Uygulamaları",
+ sub:"Diş gruplarının anatomisi, numaralandırma sistemleri ve oklüzyon ilkeleri.",
+ sections:[
+  {h:"Dişin yapısı ve yüzey adları", fig:"tooth", body:`
+   <p>Diş, kron ve kök olarak iki ana bölümden oluşur; ikisinin birleştiği yere <b>mine-sement sınırı (servikal bölge)</b> denir.</p>
+   <h4>Sert dokular</h4>
+   <ul>
+    <li><b>Mine:</b> Vücudun en sert dokusu, yaklaşık %96 mineral. Hücre içermez, kendini onaramaz.</li>
+    <li><b>Dentin:</b> Kronun rengini büyük ölçüde belirler; kanalcıklar içerdiği için duyarlıdır.</li>
+    <li><b>Sement:</b> Kök yüzeyini örter, periodontal lifler buraya tutunur.</li>
+    <li><b>Pulpa:</b> Damar ve sinir içeren yumuşak doku odası.</li>
+   </ul>
+   <h4>Yüzey adları</h4>
+   <ul>
+    <li><b>Mezial:</b> Orta hatta yakın yüzey. <b>Distal:</b> Orta hattan uzak yüzey.</li>
+    <li><b>Vestibül (bukkal/labial):</b> Yanağa veya dudağa bakan yüzey.</li>
+    <li><b>Palatinal / lingual:</b> Damağa veya dile bakan yüzey.</li>
+    <li><b>Oklüzal:</b> Arka dişlerin çiğneme yüzeyi. <b>İnsizal:</b> Ön dişlerin kesici kenarı.</li>
+   </ul>`},
+  {h:"Numaralandırma sistemleri", fig:"fdi", body:`
+   <p>Yetişkinde 32, süt dentisyonunda 20 diş bulunur. Diş gruplarının çene başına yarım sayıları: 2 kesici, 1 kanin, 2 küçük azı, 3 büyük azı.</p>
+   <h4>FDI (iki haneli) sistem</h4>
+   <p>Uluslararası standarttır. İlk hane çeyreği, ikinci hane orta hattan itibaren sırayı belirtir. Daimî dişlerde çeyrekler saat yönünde 1–4, süt dişlerinde 5–8 numaralanır.</p>
+   <ul>
+    <li><b>11:</b> Sağ üst orta kesici · <b>23:</b> Sol üst kanin · <b>36:</b> Sol alt birinci büyük azı · <b>48:</b> Sağ alt yirmi yaş dişi.</li>
+    <li>Süt dişlerinde <b>51–55, 61–65, 71–75, 81–85</b> kullanılır.</li>
+   </ul>
+   <h4>Diğer sistemler</h4>
+   <ul>
+    <li><b>Universal:</b> Sağ üst 8'inci diş 1 numaradan başlayarak 1–32 arası tek numara.</li>
+    <li><b>Palmer:</b> Çeyrek sembolü ile birlikte 1–8 arası numara.</li>
+   </ul>`,
+   quiz:[
+    {q:"FDI sisteminde 36 numaralı diş hangisidir?",o:["Sağ üst kanin","Sol alt birinci büyük azı","Sağ alt küçük azı","Sol üst ikinci kesici"],a:1,why:"3 → sol alt çeyrek, 6 → orta hattan altıncı diş, yani birinci büyük azı."},
+    {q:"Süt dişlerinde sol üst çeyreğin numarası nedir?",o:["2","5","6","7"],a:2,why:"Süt dişleri 5–8 arası çeyreklerle numaralanır; sol üst 6'dır."},
+    {q:"Bir dişin orta hatta yakın yüzeyine ne ad verilir?",o:["Distal","Mezial","Bukkal","Lingual"],a:1,why:"Mezial orta hatta yakın, distal ise uzak yüzeydir."}
+   ]},
+  {h:"Diş gruplarının morfolojik özellikleri", body:`
+   <h4>Kesiciler (insisivler)</h4>
+   <p>Kesici kenarları keskindir, tek köklüdürler. Üst orta kesici ağızdaki en geniş ön diştir ve estetiğin merkezindedir. Yeni sürmüş kesicilerde <b>mamelon</b> adı verilen üç kabartı bulunur.</p>
+   <h4>Kaninler (köpek dişleri)</h4>
+   <p>Ağızdaki <b>en uzun köke</b> sahip dişlerdir. Tek tüberküllüdürler ve kanin çıkıntısı yüz estetiğinde köşe oluşturur. Lateral çene hareketlerinde arka dişleri temastan ayıran <b>kanin rehberliği</b> görevini üstlenirler.</p>
+   <h4>Küçük azılar (premolarlar)</h4>
+   <p>Genellikle iki tüberküllüdür (bukkal ve palatinal/lingual). Üst birinci küçük azı sıklıkla <b>iki köklüdür</b>. Alt birinci küçük azıda lingual tüberkül belirgin biçimde küçüktür.</p>
+   <h4>Büyük azılar (molarlar)</h4>
+   <ul>
+    <li>Üst molarlar genellikle <b>üç köklü</b> (2 bukkal + 1 palatinal), alt molarlar <b>iki köklüdür</b> (mezial + distal).</li>
+    <li>Üst birinci moların palatinal tüberkülünde <b>Carabelli tüberkülü</b> görülebilir.</li>
+    <li>Alt birinci molar çoğunlukla beş tüberküllüdür ve ağızda en erken süren daimî diştir (yaklaşık 6 yaş).</li>
+   </ul>
+   <p>Modelaj çalışmalarında tüberkül tepeleri, kenar sırtları, oluk yönleri ve temas noktalarının konumu bire bir taklit edilmelidir; bunlar çiğneme verimini ve gıda akışını belirler.</p>`},
+  {h:"Oklüzyon ve çene hareketleri", body:`
+   <p><b>Oklüzyon</b>, alt ve üst dişlerin temas ilişkisidir. Protetik çalışmanın tümü bu ilişkiyi bozmadan yeniden kurmayı hedefler.</p>
+   <h4>Temel kavramlar</h4>
+   <ul>
+    <li><b>Merkezî ilişki (sentrik relasyon):</b> Kondillerin çukurdaki en üst-ön konumu; dişlerden bağımsız, tekrarlanabilir bir kayıttır.</li>
+    <li><b>Maksimum interkuspidasyon:</b> Dişlerin en çok temas ettiği kapanış.</li>
+    <li><b>Dikey boyut:</b> Kapanışta yüzün alt bölümünün yüksekliği. Yanlış belirlenirse çiğneme, konuşma ve eklem sorunları doğar.</li>
+   </ul>
+   <h4>Angle sınıflaması</h4>
+   <ul>
+    <li><b>Sınıf I:</b> Üst birinci moların mezio-bukkal tüberkülü, alt birinci moların bukkal oluğuna oturur (normal ilişki).</li>
+    <li><b>Sınıf II:</b> Alt çene geride kalmıştır (retrognati eğilimi).</li>
+    <li><b>Sınıf III:</b> Alt çene öndedir (prognati eğilimi).</li>
+   </ul>
+   <h4>Rehberlikler ve eğriler</h4>
+   <p>Öne hareket sırasında ön dişlerin arka dişleri ayırmasına <b>anterior rehberlik</b>, yana hareket sırasında kaninlerin ayırmasına <b>kanin rehberliği</b> denir. <b>Spee eğrisi</b> sagittal düzlemdeki, <b>Wilson eğrisi</b> ise transversal düzlemdeki kompanzasyon eğrisidir.</p>`,
+   quiz:[
+    {q:"Ağızdaki en uzun köke sahip diş hangisidir?",o:["Üst orta kesici","Kanin","Alt birinci molar","Üst ikinci premolar"],a:1,why:"Kanin, uzun kökü sayesinde lateral hareketlerde rehberlik görevi üstlenir."},
+    {q:"Angle Sınıf I ilişki neyi tanımlar?",o:["Alt çenenin ileride olmasını","Üst birinci molar mezio-bukkal tüberkülünün alt molar bukkal oluğuna oturmasını","Ön dişlerin hiç temas etmemesini","Dikey boyutun düşük olmasını"],a:1,why:"Sınıf I normal molar ilişkisidir."},
+    {q:"Spee eğrisi hangi düzlemdedir?",o:["Sagittal (ön-arka)","Transversal (sağ-sol)","Frontal","Horizontal değil, dikey"],a:0,why:"Wilson eğrisi transversal, Spee eğrisi sagittal düzlemdedir."}
+   ]}
+ ],
+ match:{title:"Dişi özelliğiyle eşleştir", pairs:[
+  ["Üst birinci molar","Carabelli tüberkülü görülebilir"],
+  ["Alt birinci molar","Genellikle beş tüberküllü, ilk süren daimî diş"],
+  ["Kanin","En uzun kök, lateral rehberlik"],
+  ["Üst birinci premolar","Sıklıkla iki köklü"],
+  ["Yeni sürmüş kesici","Mamelon kabartıları"],
+  ["FDI 48","Sağ alt yirmi yaş dişi"]
+ ]},
+ exam:[
+  {q:"Dişin rengini büyük ölçüde belirleyen doku hangisidir?",o:["Mine","Dentin","Sement","Pulpa"],a:1,why:"Mine yarı saydamdır; altındaki dentinin rengi yansır."},
+  {q:"Yetişkinde toplam daimî diş sayısı kaçtır?",o:["20","28","32","36"],a:2,why:"Yirmi yaş dişleri dahil 32 diştir."},
+  {q:"FDI'de 23 numaralı diş hangisidir?",o:["Sol üst kanin","Sağ üst kanin","Sol alt kesici","Sağ alt premolar"],a:0,why:"2 → sol üst çeyrek, 3 → kanin."},
+  {q:"Üst molarların kök sayısı genellikle kaçtır?",o:["1","2","3","4"],a:2,why:"İki bukkal ve bir palatinal kök bulunur."},
+  {q:"Kondillerin çukurdaki en üst-ön konumunu tanımlayan kayıt hangisidir?",o:["Maksimum interkuspidasyon","Merkezî ilişki","Protrüzyon","Dinlenme konumu"],a:1,why:"Merkezî ilişki dişlerden bağımsız, tekrarlanabilir referans konumudur."},
+  {q:"Arka dişlerin çiğneme yüzeyine ne ad verilir?",o:["İnsizal","Oklüzal","Servikal","Apikal"],a:1,why:"Ön dişlerde insizal, arka dişlerde oklüzal yüzey kullanılır."},
+  {q:"Lateral hareket sırasında arka dişleri temastan ayıran rehberlik hangisidir?",o:["Kanin rehberliği","Kondiler rehberlik","İnsizal yol","Bennett hareketi"],a:0,why:"Kanin rehberliği çalışan tarafta diğer dişleri korur."},
+  {q:"Süt dişi sayısı kaçtır?",o:["16","20","24","28"],a:1,why:"Süt dentisyonunda her çeyrekte 5 diş, toplam 20 diş bulunur."}
+ ]
+},
+{
+ id:"m5", code:"B1", tag:"Hareketli Protez", title:"Hareketli Protez ve Uygulamaları-II",
+ sub:"Bölümlü protezler: Kennedy sınıflaması, paralelometre, kroşeler ve metal iskelet.",
+ sections:[
+  {h:"Bölümlü protez ve Kennedy sınıflaması", body:`
+   <p>Bölümlü protez, ağızda bir kısım doğal diş varken uygulanan hareketli protezdir. Desteğini hem <b>dişlerden</b> hem <b>mukozadan</b> alır; bu iki dokunun hareket miktarı farklı olduğu için tasarım özen ister.</p>
+   <h4>Kennedy sınıflaması</h4>
+   <ul>
+    <li><b>Sınıf I:</b> İki taraflı serbest sonlu (arkada dayanak diş yok).</li>
+    <li><b>Sınıf II:</b> Tek taraflı serbest sonlu.</li>
+    <li><b>Sınıf III:</b> Boşluğun iki yanında da diş var (dişle sınırlı).</li>
+    <li><b>Sınıf IV:</b> Orta hattı geçen tek ön boşluk.</li>
+   </ul>
+   <p>Applegate kurallarına göre ana sınıfı <b>en arkadaki boşluk</b> belirler; diğer boşluklar <b>modifikasyon</b> olarak sayılır. Sınıf IV'ün modifikasyonu olmaz.</p>
+   <h4>Destek biçimine göre</h4>
+   <ul>
+    <li><b>Dişten destekli:</b> Genellikle Sınıf III; kuvvet doğrudan dişlere aktarılır, en stabil gruptur.</li>
+    <li><b>Doku (mukoza) destekli:</b> Geçici akrilik protezler.</li>
+    <li><b>Diş-doku destekli:</b> Sınıf I ve II; serbest sonlu eyerde batma olacağı için <b>stres kırıcı</b> tasarım ve iyi bir eyer uzunluğu gerekir.</li>
+   </ul>`},
+  {h:"Paralelometre ve tasarım", fig:"rpd", body:`
+   <p><b>Paralelometre (surveyor)</b>, model üzerinde tek bir yerleştirme yolu belirlemek ve alt açıları saptamak için kullanılan cihazdır.</p>
+   <h4>Ne sağlar?</h4>
+   <ul>
+    <li><b>Rehber düzlemler:</b> Birbirine paralel diş yüzeyleri; protezin tek yolda girip çıkmasını sağlar.</li>
+    <li><b>Ölçüm çizgisi (survey line):</b> Dişin en geniş çevresi. Bu çizginin üstü alt açısız, altı alt açılıdır.</li>
+    <li><b>Alt açı miktarı:</b> Kroşe ucunun gireceği derinlik (genelde 0,25–0,50 mm) ölçüm çubuklarıyla belirlenir.</li>
+    <li><b>Blockout:</b> İstenmeyen alt açıların mumla kapatılması.</li>
+   </ul>
+   <h4>Tasarımın dört öğesi</h4>
+   <p>Her bölümlü protez tasarımında dört bileşen belirlenir: <b>destek (oklüzal tırnaklar)</b>, <b>tutuculuk (kroşeler veya hassas tutucular)</b>, <b>stabilite (rijit bağlayıcılar)</b> ve <b>eyerler</b>. Tasarım, kuvvetleri mümkün olduğunca çok dişe ve geniş mukoza alanına dağıtacak biçimde kurulur.</p>`,
+   quiz:[
+    {q:"Kennedy Sınıf I neyi tanımlar?",o:["Tek taraflı serbest sonlu boşluk","İki taraflı serbest sonlu boşluk","Dişle sınırlı boşluk","Ön bölgede orta hattı geçen boşluk"],a:1,why:"Sınıf I'de her iki arka bölgede de dayanak diş yoktur."},
+    {q:"Paralelometrenin temel işlevi nedir?",o:["Protezi cilalamak","Tek yerleştirme yolu ve alt açıları belirlemek","Metal dökmek","Rengi seçmek"],a:1,why:"Cihaz, rehber düzlemleri ve ölçüm çizgisini saptar."},
+    {q:"Ölçüm çizgisi (survey line) neyi gösterir?",o:["Dişin en dar yerini","Dişin en geniş çevresini","Dişeti sınırını","Kök ucunu"],a:1,why:"Bu çizginin altı alt açılı bölgedir; kroşe ucu buraya girer."}
+   ]},
+  {h:"Kroşeler ve bağlayıcılar", body:`
+   <h4>Kroşe (klasp) bileşenleri</h4>
+   <ul>
+    <li><b>Tutucu kol:</b> Esnek uçtur, alt açıya girer ve tutuculuğu sağlar.</li>
+    <li><b>Karşıt (retansiyon karşıtı) kol:</b> Rijittir, ölçüm çizgisinin üstünde kalır ve dişi karşı yönde destekler.</li>
+    <li><b>Oklüzal tırnak:</b> Dikey kuvveti dişin uzun eksenine iletir; protezin dişeti yönünde batmasını engeller.</li>
+   </ul>
+   <h4>Sık kullanılan tipler</h4>
+   <ul>
+    <li><b>Akers (dairesel) kroşe:</b> Dişten destekli bölgelerde en yaygın tip.</li>
+    <li><b>RPI sistemi:</b> Mezial tırnak + proksimal plak + I-bar. Serbest sonlu vakalarda dişe binen zararlı kuvveti azaltır.</li>
+    <li><b>Ring, back-action ve kombine kroşeler:</b> Özel alt açı konumlarında kullanılır.</li>
+   </ul>
+   <h4>Büyük bağlayıcılar</h4>
+   <ul>
+    <li><b>Üst çene:</b> Palatinal bar, ön-arka palatinal bar, palatinal plak. Rijit olmalı ve dişeti kenarına en az 6 mm mesafede bitmelidir.</li>
+    <li><b>Alt çene:</b> Lingual bar en yaygın seçenektir; ağız tabanı yüksekliği 8 mm'nin altındaysa lingual plak tercih edilir. Bar üst kenarı, dişeti kenarından en az 3 mm uzakta olmalıdır.</li>
+   </ul>
+   <p>Küçük bağlayıcılar, tırnak ve eyerleri büyük bağlayıcıya bağlar; dişeti kenarına dik açıyla ve yuvarlatılmış geçişle birleşir.</p>`},
+  {h:"İskelet dökümü ve laboratuvar aşamaları", body:`
+   <p>Metal iskelet üretimi sıralı ve geri dönüşü olmayan bir zincirdir; her aşamadaki hata bir sonrakine büyüyerek taşınır.</p>
+   <ol>
+    <li><b>Ana model:</b> Tip IV alçı ile dökülür, paralelometrede analiz edilir, tasarım kalemle çizilir.</li>
+    <li><b>Blockout ve rölyef:</b> Alt açılar mumla kapatılır; bar altına ince rölyef mumu konarak dokuya baskı önlenir.</li>
+    <li><b>Dublikasyon:</b> Ana model agar veya silikon ile kopyalanır, revetman (silika/fosfat bağlı) ile <b>refrakter model</b> elde edilir.</li>
+    <li><b>Mum modelaj:</b> Hazır profil mumları (bar, kroşe, ızgara) refrakter model üzerine yerleştirilir.</li>
+    <li><b>Tijleme ve revetmana alma:</b> Kalın kesitlere besleyici tij bağlanır.</li>
+    <li><b>Burn-out ve döküm:</b> Krom-kobalt yüksek ısıda indüksiyonla dökülür.</li>
+    <li><b>Bitirme:</b> Kumlama, tij kesimi, taşlama, elektrolitik parlatma ve keçe-macun ile polisaj.</li>
+   </ol>
+   <p>İskelet model üzerinde <b>zorlamadan</b> oturmalıdır. Ardından mum duvar hazırlanır, dişler dizilir, prova sonrası akrilik tepilerek protez bitirilir.</p>`,
+   quiz:[
+    {q:"Oklüzal tırnağın görevi nedir?",o:["Tutuculuk sağlamak","Dikey kuvveti dişin uzun eksenine iletmek","Estetiği artırmak","Dişeti kanamasını önlemek"],a:1,why:"Tırnak, protezin dişeti yönünde batmasını engelleyen destek öğesidir."},
+    {q:"Alt çenede lingual bar için ağız tabanı yüksekliği yetersizse ne kullanılır?",o:["Palatinal plak","Lingual plak","Ring kroşe","Ovat pontik"],a:1,why:"Yer 8 mm'nin altındaysa lingual plak tercih edilir."},
+    {q:"Refrakter model neden gereklidir?",o:["Daha ucuz olduğu için","Yüksek döküm ısısına dayanması gerektiği için","Rengi güzel olduğu için","Hastaya verildiği için"],a:1,why:"Alçı model döküm ısısına dayanmaz; revetman esaslı refrakter model kullanılır."}
+   ]}
+ ],
+ match:{title:"Bileşeni işleviyle eşleştir", pairs:[
+  ["Tutucu kroşe kolu","Alt açıya girerek tutuculuk sağlar"],
+  ["Karşıt kol","Rijittir, dişi karşı yönde destekler"],
+  ["Lingual bar","Alt çenede büyük bağlayıcı"],
+  ["Blockout","İstenmeyen alt açının mumla kapatılması"],
+  ["RPI sistemi","Serbest sonlu vakada dişi koruyan kroşe düzeni"],
+  ["Dublikasyon","Ana modelin refrakter modele kopyalanması"]
+ ]},
+ exam:[
+  {q:"Applegate kurallarına göre ana sınıfı belirleyen boşluk hangisidir?",o:["En öndeki boşluk","En arkadaki boşluk","En geniş boşluk","İlk çekilen dişin boşluğu"],a:1,why:"Diğer boşluklar modifikasyon olarak sayılır."},
+  {q:"Kennedy Sınıf IV'ün özelliği nedir?",o:["Modifikasyonu olmaz","Her zaman iki taraflıdır","Sadece alt çenede olur","Kroşe gerektirmez"],a:0,why:"Sınıf IV tek, orta hattı geçen ön boşluktur; modifikasyon almaz."},
+  {q:"Kroşe ucunun gireceği tipik alt açı derinliği nedir?",o:["0,01 mm","0,25–0,50 mm","1,5 mm","3 mm"],a:1,why:"Alaşım esnekliğine göre genelde 0,25 mm civarı seçilir."},
+  {q:"Üst çenede büyük bağlayıcı, dişeti kenarından en az kaç mm uzakta bitmelidir?",o:["1 mm","3 mm","6 mm","12 mm"],a:2,why:"Üst çenede 6 mm, alt lingual barda 3 mm kuralı uygulanır."},
+  {q:"Serbest sonlu (Sınıf I) vakalarda temel sorun nedir?",o:["Estetik yetersizliği","Diş ve mukozanın farklı miktarda hareket etmesi","Metal eksikliği","Renk uyumsuzluğu"],a:1,why:"Eyer batarken dayanak dişe kaldıraç kuvveti biner; RPI gibi çözümler kullanılır."},
+  {q:"Büyük bağlayıcının en temel özelliği ne olmalıdır?",o:["Esnek olmalı","Rijit olmalı","İnce ve yaylanabilir olmalı","Şeffaf olmalı"],a:1,why:"Rijitlik, kuvvetin geniş alana dağıtılmasını sağlar."},
+  {q:"Bölümlü protez iskeletinde en yaygın alaşım hangisidir?",o:["Krom-kobalt","Bakır-çinko","Kurşun","Alüminyum"],a:0,why:"Yüksek elastik modülü ve biyouyumluluğu nedeniyle tercih edilir."},
+  {q:"Metal iskelet ana modele nasıl oturmalıdır?",o:["Zorlanarak","Hiç oturmadan","Zorlamadan, pasif olarak","Simanla sabitlenerek"],a:2,why:"Pasif uyum, dişlere zararlı gerilim binmesini önler."}
+ ]
+},
+
+{
+ id:"m6", code:"B2", tag:"Porselen", title:"Porselen Protezleri-I",
+ sub:"Dental porselenin yapısı, metal-seramik sistemler, tabakalama ve fırınlama.",
+ sections:[
+  {h:"Dental porselenin yapısı ve sınıflandırılması", body:`
+   <p>Dental porselen, ağız içinde mineye en yakın optik ve yüzey özelliklerini veren seramik esaslı bir malzemedir. Aşınmaya dirençli, renk kararlılığı yüksek ve biyouyumludur; buna karşılık <b>kırılgandır</b> ve çekme kuvvetlerine zayıftır.</p>
+   <h4>Temel bileşenler</h4>
+   <ul>
+    <li><b>Feldspat:</b> Isıtıldığında camsı faz oluşturur; saydamlığı sağlar.</li>
+    <li><b>Kuvars (silika):</b> İskeleti oluşturur, boyutsal kararlılık verir.</li>
+    <li><b>Kaolin:</b> Pişmemiş porselene şekil verilebilirlik (plastisite) kazandırır; dental porselende oranı düşüktür.</li>
+    <li><b>Metal oksitler:</b> Renk pigmentleri. <b>Opaklaştırıcılar</b> ise ışığın geçişini azaltır.</li>
+   </ul>
+   <h4>Fırınlama ısısına göre</h4>
+   <ul>
+    <li><b>Yüksek ısı (1300°C üzeri):</b> Hazır porselen diş üretimi.</li>
+    <li><b>Orta ısı (1100–1300°C):</b> Jaket kron.</li>
+    <li><b>Düşük ısı (850–1100°C):</b> Metal-seramik üstyapı porseleni; alaşımı deforme etmeden pişer.</li>
+    <li><b>Ultra düşük ısı (850°C altı):</b> Titanyum ve bazı alaşımlar için.</li>
+   </ul>`},
+  {h:"Metal-seramik sistemler ve bağlanma", fig:"layers", body:`
+   <p>Metal-seramik (PFM) restorasyon, metalin dayanıklılığı ile porselenin estetiğini birleştirir.</p>
+   <h4>Bağlanma mekanizmaları</h4>
+   <ul>
+    <li><b>Kimyasal bağ:</b> En önemli mekanizmadır. Metal yüzeyinde oluşan <b>oksit tabakası</b>, opak porselenle kimyasal bağ kurar.</li>
+    <li><b>Mekanik kilitlenme:</b> Kumlanmış pürüzlü yüzeye porselenin girmesi.</li>
+    <li><b>Sıkıştırma kuvvetleri:</b> Alaşımın ısıl genleşme katsayısı porselenden bir miktar yüksek seçilir; soğuma sırasında porselen hafif basınç altında kalır ve çatlamaz.</li>
+   </ul>
+   <h4>Altyapı hazırlığı</h4>
+   <ol>
+    <li>Döküm sonrası altyapı taşlanır; taşlama izleri <b>tek yönde</b> olmalıdır.</li>
+    <li>Alüminyum oksit (50–110 µm) ile kumlanır, buharla temizlenir; elle tutulmaz.</li>
+    <li><b>Oksitleme (degassing) fırınlaması</b> yapılır: yüzey oksit tabakası oluşur, gazlar uzaklaşır.</li>
+    <li>Aşırı kalın veya kirli oksit tabakası bağlantıyı zayıflatır, yeşilimsi renklenme yapar.</li>
+   </ol>
+   <p>Altyapı tasarımında kural: <b>porselen desteklenmelidir.</b> Desteklenmeyen, 2 mm'den kalın porselen kütlesi kırılmaya adaydır.</p>`,
+   quiz:[
+    {q:"Metal ile porselen arasındaki en önemli bağlanma türü hangisidir?",o:["Mekanik kilitlenme","Oksit tabakası üzerinden kimyasal bağ","Manyetik çekim","Yapıştırıcı ile bağlanma"],a:1,why:"Kimyasal bağ, bağlantı dayanımının büyük bölümünü oluşturur."},
+    {q:"Alaşımın ısıl genleşme katsayısı porselene göre nasıl olmalıdır?",o:["Çok daha düşük","Bir miktar yüksek","Tamamen aynı olmak zorunda","Önemi yoktur"],a:1,why:"Böylece soğurken porselen basınç altında kalır ve çatlamaz."},
+    {q:"Degassing (oksitleme) fırınlamasının amacı nedir?",o:["Rengi koyulaştırmak","Oksit tabakası oluşturup gazları uzaklaştırmak","Metali eritmek","Porseleni parlatmak"],a:1,why:"Bu aşama bağlanmayı hazırlar ve gaz kabarcığını önler."}
+   ]},
+  {h:"Tabakalama tekniği ve fırınlama", body:`
+   <h4>Katman sırası</h4>
+   <ol>
+    <li><b>Opak:</b> Metalin grisini örter ve kimyasal bağı kurar. İnce ve düzgün sürülür; ilk kat çok ince (wash opak) uygulanır.</li>
+    <li><b>Dentin (body):</b> Rengin gövdesini oluşturur, diş formunun büyük bölümünü verir.</li>
+    <li><b>Mine (insizal/enamel):</b> Kesici kenar ve tüberkül bölgesinde saydamlık sağlar.</li>
+    <li><b>Karakterizasyon ve glazür:</b> Boya ile renk detayları verilir; glazür yüzeyi camsı ve pürüzsüz yapar.</li>
+   </ol>
+   <p>Porselen pişerken <b>%20–40 arası büzülür.</b> Bu nedenle modelaj gerçek boyutun üzerinde yapılır ve genellikle ikinci bir dentin fırınlaması (düzeltme pişimi) gerekir.</p>
+   <h4>Kondensasyon (yoğunlaştırma)</h4>
+   <p>Sürülen porselen bulamacındaki fazla su, titreşim ve emici kağıt ile uzaklaştırılır. İyi kondensasyon, gözenekliliği azaltır ve büzülmeyi düşürür.</p>
+   <h4>Fırınlama kuralları</h4>
+   <ul>
+    <li>Fırına verilmeden önce <b>kurutma</b> aşaması uygulanır; ıslak porselen ani ısıda çatlar.</li>
+    <li>Metal-seramikte pişim çoğunlukla <b>vakum altında</b> yapılır; vakum hava kabarcıklarını çeker ve saydamlığı artırır.</li>
+    <li>Her pişim, bir öncekinden bir miktar düşük ısıda yapılır.</li>
+    <li>Soğutma yavaş olmalıdır; hızlı soğutma iç gerilim ve gecikmiş çatlak bırakır.</li>
+   </ul>`},
+  {h:"Renk seçimi ve sık görülen hatalar", body:`
+   <h4>Rengin üç boyutu</h4>
+   <ul>
+    <li><b>Ton (hue):</b> Rengin kendisi — VITA klasik ölçeğinde A (kırmızı-kahve), B (kırmızı-sarı), C (gri), D (kırmızı-gri).</li>
+    <li><b>Doygunluk (chroma):</b> Rengin yoğunluğu — A1'den A4'e artar.</li>
+    <li><b>Parlaklık (value):</b> Açıklık-koyuluk. Gözün en önce fark ettiği boyuttur; yanlış parlaklık en göze batan hatadır.</li>
+   </ul>
+   <p>Renk seçimi gün ışığına yakın nötr ışıkta, ıslak diş yüzeyinde ve kısa sürede (5–7 saniyelik bakışlarla) yapılır. Uzun bakış gözü yorar ve renk körelmesi yaratır.</p>
+   <h4>Sık hatalar ve nedenleri</h4>
+   <ul>
+    <li><b>Porselende çatlak:</b> Isıl genleşme uyumsuzluğu, hızlı soğutma veya desteklenmemiş porselen.</li>
+    <li><b>Yeşilimsi renklenme:</b> Kalın/kirli oksit tabakası, gümüş içeren alaşımlarda buharlaşma.</li>
+    <li><b>Kabarcıklanma:</b> Yetersiz kondensasyon, kirli altyapı veya vakumsuz pişim.</li>
+    <li><b>Mat, ölü görünüm:</b> Aşırı pişirme ve glazürün fazla akması.</li>
+    <li><b>Renk koyuluğu:</b> Yetersiz preparasyon nedeniyle opak katmanın kalın kalması.</li>
+   </ul>`,
+   quiz:[
+    {q:"Porselen pişim sırasında yaklaşık ne kadar büzülür?",o:["%1–2","%5","%20–40","Hiç büzülmez"],a:2,why:"Bu nedenle modelaj daima gerçek boyuttan fazla yapılır."},
+    {q:"Rengin gözün en önce fark ettiği boyutu hangisidir?",o:["Ton (hue)","Doygunluk (chroma)","Parlaklık (value)","Saydamlık"],a:2,why:"Parlaklık hatası en belirgin uyumsuzluğu yaratır."},
+    {q:"Porselen fırınlamasında vakum niçin kullanılır?",o:["Isıyı düşürmek için","Hava kabarcıklarını uzaklaştırıp saydamlığı artırmak için","Rengi koyulaştırmak için","Süreyi uzatmak için"],a:1,why:"Vakum, gözeneksiz ve daha saydam bir yapı sağlar."}
+   ]}
+ ],
+ match:{title:"Katmanı/kavramı işleviyle eşleştir", pairs:[
+  ["Opak porselen","Metalin rengini örter, bağı kurar"],
+  ["Dentin porseleni","Rengin gövdesini oluşturur"],
+  ["Mine porseleni","Kesici kenarda saydamlık verir"],
+  ["Glazür","Camsı, pürüzsüz yüzey"],
+  ["Kondensasyon","Fazla suyun uzaklaştırılması"],
+  ["Feldspat","Camsı fazı oluşturan ana bileşen"]
+ ]},
+ exam:[
+  {q:"Dental porselene saydamlık veren camsı fazı hangi bileşen oluşturur?",o:["Kaolin","Feldspat","Kuvars","Alümina"],a:1,why:"Feldspat eridiğinde cam matriksi oluşturur."},
+  {q:"Metal-seramik üstyapı porseleni hangi ısı grubundadır?",o:["Ultra yüksek","Yüksek","Düşük (850–1100°C)","Isı önemsizdir"],a:2,why:"Alaşımın deforme olmaması için düşük ısılı porselen kullanılır."},
+  {q:"Metal altyapı kumlandıktan sonra ne yapılmalıdır?",o:["Elle tutulup kurulanmalı","Buharla temizlenip elle temas edilmemeli","Yağlanmalı","Suda bekletilmeli"],a:1,why:"Yağ ve kir bağlantıyı bozar; yüzey temiz kalmalıdır."},
+  {q:"Desteklenmemiş kalın porselen kütlesi neye yol açar?",o:["Daha iyi estetik","Kırılma riski","Daha hızlı pişme","Renk açılması"],a:1,why:"Porselen çekmeye zayıftır; altyapı anatomik destek vermelidir."},
+  {q:"Wash opak neden ince uygulanır?",o:["Boya tasarrufu için","Metal yüzeyini ıslatıp bağlantıyı başlatmak için","Rengi koyulaştırmak için","Vakumu artırmak için"],a:1,why:"İnce ilk kat yüzeyi tam ıslatır ve kabarcık oluşumunu azaltır."},
+  {q:"VITA klasik ölçeğinde A grubu hangi tonu belirtir?",o:["Kırmızı-kahverengi","Gri","Kırmızı-sarı","Mavi"],a:0,why:"A: kırmızı-kahve, B: kırmızı-sarı, C: gri, D: kırmızı-gri."},
+  {q:"Restorasyonda yeşilimsi renklenmenin olası nedeni nedir?",o:["Fazla glazür","Kalın veya kirli oksit tabakası","Düşük vakum","Fazla mine porseleni"],a:1,why:"Kontrolsüz oksitlenme ve bazı alaşım elementleri renklenme yapar."},
+  {q:"Renk seçimi nasıl yapılmalıdır?",o:["Uzun uzun bakarak, kuru dişte","Nötr ışıkta, ıslak yüzeyde, kısa bakışlarla","Yalnızca yapay sarı ışıkta","Fırın odasında"],a:1,why:"Uzun bakış renk körelmesi yaratır; nem doğal saydamlığı gösterir."}
+ ]
+},
+
+{
+ id:"m7", code:"B3", tag:"Hareketli Protez", title:"Hareketli Protez ve Uygulamaları-III",
+ sub:"Tamir, besleme, immediat protezler, overdenture ve esnek protezler.",
+ sections:[
+  {h:"Protez tamiri", body:`
+   <p>Kırık protez, hastanın en sık laboratuvara dönüş nedenidir. Tamirin başarısı, parçaların <b>doğru konumda</b> birleştirilmesine bağlıdır.</p>
+   <h4>Kırık nedenleri</h4>
+   <ul>
+    <li>Düşme gibi darbeler (en sık).</li>
+    <li>Dengesiz oklüzyon ve kaidenin dokuya uyumsuzluğu; kemik erimesiyle protez altında boşluk oluşması.</li>
+    <li>Frenulum çentiği veya derin damak çizgisi gibi ince kesitli bölgeler.</li>
+    <li>Akrilikte gözeneklilik veya yetersiz polimerizasyon.</li>
+   </ul>
+   <h4>Tamir sırası</h4>
+   <ol>
+    <li>Parçalar birebir birleştirilip <b>yapışkan mum</b> veya çubukla sabitlenir.</li>
+    <li>Alçı ile onarım modeli (indeks) alınır; model ayırıcı sürülür.</li>
+    <li>Kırık hat boyunca V şeklinde oyuk açılarak <b>yüzey alanı artırılır</b> (yaklaşık 3–4 mm genişlik).</li>
+    <li>Otopolimerizan akrilik monomer-polimer sıralı (salt-and-pepper) veya hamur olarak uygulanır.</li>
+    <li>Basınçlı kapta (35–40°C su, ~2 bar, 15–20 dk) polimerize edilir; gözeneklilik azalır.</li>
+    <li>Tesviye, kaba ve ince polisaj, keçe-pomza ve son parlatma yapılır.</li>
+   </ol>
+   <p>Kırık tekrarlıyorsa neden mekaniktir: oklüzyon ve uyum düzeltilmeden yapılan tamir kısa sürede yeniden kırılır. Gerekirse kırık hattına metal tel veya fiber destek yerleştirilir.</p>`},
+  {h:"Besleme (reline) ve kaide yenileme (rebase)", fig:"denture", body:`
+   <p>Diş çekimi sonrası kemik yıllar içinde erimeye devam eder (rezorpsiyon). Protez ile doku arasında boşluk oluşunca tutuculuk düşer, protez oynar ve yara açar.</p>
+   <ul>
+    <li><b>Reline (besleme):</b> Yalnızca kaidenin doku yüzeyine yeni akrilik eklenir. Dişler ve kalınlık korunur.</li>
+    <li><b>Rebase (kaide yenileme):</b> Dişler korunarak tüm kaide yenilenir. Kaide rengi bozulmuş ya da fazla incelmişse tercih edilir.</li>
+   </ul>
+   <h4>Uygulama</h4>
+   <p>Doğrudan yöntemde ağızda hızlı sertleşen madde kullanılır; dolaylı (laboratuvar) yöntemde protezin kendisi ölçü kaşığı gibi kullanılır, ölçü alınır ve muflada ısı ile polimerize akrilikle beslenir. Dolaylı yöntem daha dayanıklı ve daha az monomer artığı bırakır.</p>
+   <h4>Yumuşak astar (soft liner)</h4>
+   <p>Keskin kret, ince mukoza veya ağrılı bölgelerde silikon esaslı yumuşak astar kullanılır. Kalıcı çözüm değildir: zamanla sertleşir, renklenir ve <b>mantar üremesine</b> açık hale gelir; düzenli değişim gerekir.</p>
+   <p><b>Uyarı:</b> Doku iyileşmeden (doku koşullandırıcı ile 1–2 hafta beklenmeden) alınan besleme ölçüsü, hatalı bir kaide yüzeyi doğurur.</p>`,
+   quiz:[
+    {q:"Reline ile rebase arasındaki fark nedir?",o:["Reline dişleri değiştirir","Rebase tüm kaideyi yeniler, reline yalnızca doku yüzeyine ekleme yapar","İkisi aynıdır","Rebase yalnızca üst çenede yapılır"],a:1,why:"Rebase daha kapsamlı bir işlemdir; dişler korunur, kaide baştan yapılır."},
+    {q:"Protez tamirinde kırık hat boyunca oyuk açılmasının nedeni nedir?",o:["Akrilikten tasarruf","Bağlanma yüzey alanını artırmak","Rengi eşitlemek","Ağırlığı azaltmak"],a:1,why:"Geniş temas yüzeyi, tamirin dayanımını belirler."},
+    {q:"Yumuşak astar (soft liner) için doğru olan hangisidir?",o:["Ömür boyu kullanılır","Zamanla sertleşir ve mantar üremesine açıktır","Sadece metal protezlerde olur","Polisaj gerektirmez"],a:1,why:"Düzenli kontrol ve yenileme gerekir."}
+   ]},
+  {h:"İmmediat protezler ve doku koşullandırma", body:`
+   <p><b>İmmediat protez</b>, dişler çekilmeden önce hazırlanan ve çekim seansında hemen takılan protezdir.</p>
+   <h4>Üstünlükleri</h4>
+   <ul>
+    <li>Hasta hiç dişsiz kalmaz; estetik ve konuşma korunur.</li>
+    <li>Protez kanamayı kontrol eden bir bandaj gibi davranır, iyileşmeyi düzenler.</li>
+    <li>Mevcut dişlerin biçim ve dizilişi model üzerinde kopyalanabilir.</li>
+   </ul>
+   <h4>Sınırlılıkları</h4>
+   <ul>
+    <li>Ön prova yapılamaz; ön diş dizimi tahmine dayanır.</li>
+    <li>İyileşme sürecinde kemik hızla eridiği için <b>kısa sürede besleme</b> gerekir.</li>
+    <li>Maliyet ve kontrol seansı sayısı artar.</li>
+   </ul>
+   <h4>Laboratuvar farkı</h4>
+   <p>Model üzerinde çekilecek dişler alçıdan kesilir ve alveol kreti, iyileşme sonrası biçimi taklit edecek şekilde <b>hafifçe yuvarlatılır</b>. Aşırı kazıma protezin dokuya baskı yapmasına, az kazıma ise protezin oturmamasına yol açar.</p>
+   <h4>Doku koşullandırıcılar</h4>
+   <p>Uzun süre uyumsuz protez kullanmış hastalarda mukoza şişmiş ve deforme olmuştur. Yumuşak, akışkan doku koşullandırıcılar protez içine uygulanır; birkaç gün ara ile yenilenerek dokunun sağlıklı haline dönmesi sağlanır. Ölçü ancak bundan sonra alınır.</p>`},
+  {h:"Overdenture ve esnek protezler", body:`
+   <h4>Overdenture (üst örtücü protez)</h4>
+   <p>Kalan kökler veya implantlar üzerine oturan total protezdir. Temel yararı, kök çevresindeki kemiğin korunması ve <b>propriosepsiyon</b> (basınç duyusu) sayesinde çiğnemenin daha kontrollü olmasıdır.</p>
+   <ul>
+    <li><b>Kök üstü:</b> Kanal tedavisi yapılmış kökler kısaltılır, üzerine kubbe biçimli koruyucu başlık yapılır.</li>
+    <li><b>Tutucu sistemler:</b> Bar-klips, top (ball) tutucu, lokator ve mıknatıs.</li>
+    <li>Kalan kökler ideal olarak <b>kanin bölgesinde</b> ve simetrik dağılımda seçilir.</li>
+   </ul>
+   <h4>Esnek (termoplastik) protezler</h4>
+   <p>Poliamid (naylon) esaslı, metal kroşe kullanmadan diş rengi/pembe kroşelerle tutunan protezlerdir.</p>
+   <ul>
+    <li><b>Üstünlük:</b> Estetik, kırılmaya dirençli, monomer içermez (akrilik alerjisinde seçenek).</li>
+    <li><b>Sınırlılık:</b> Esnek olduğu için kuvvet dağılımı zayıftır, kemik erimesini hızlandırabilir; beslenmesi ve tamiri zordur, cilası özel donanım ister.</li>
+   </ul>
+   <h4>Protez bakımı — hastaya anlatılacaklar</h4>
+   <ul>
+    <li>Her öğün sonrası protez fırçayla ve <b>diş macunu olmadan</b> yıkanır; macun aşındırıcıdır.</li>
+    <li>Gece çıkarılıp suda bekletilir; sıcak su deformasyon yapar.</li>
+    <li>Çamaşır suyu metal parçaları karartır ve korozyona uğratır.</li>
+    <li>Yılda en az bir kez kontrol; ağrı ve yara varsa protezi kendi kendine törpülemek yasaktır.</li>
+   </ul>`,
+   quiz:[
+    {q:"İmmediat protezin en belirgin sınırlılığı nedir?",o:["Estetik kaybı","Ön prova yapılamaması","Çok ucuz olması","Dişsiz dönem yaratması"],a:1,why:"Dişler yerinde olduğu için prova aşaması atlanır."},
+    {q:"Overdenture'ın kök üzerine yapılmasının temel yararı nedir?",o:["Daha ucuz olması","Kemiğin korunması ve basınç duyusunun sürmesi","Renginin daha iyi olması","Hiç bakım gerektirmemesi"],a:1,why:"Kök varlığı alveol kemiğinin erimesini yavaşlatır."},
+    {q:"Protez temizliğinde neden diş macunu önerilmez?",o:["Köpürmediği için","Aşındırıcı olduğu ve yüzeyde çizik bıraktığı için","Pahalı olduğu için","Rengi değiştirdiği için"],a:1,why:"Çizikler plak tutulumunu artırır; özel protez temizleyicileri kullanılır."}
+   ]}
+ ],
+ match:{title:"İşlemi tanımıyla eşleştir", pairs:[
+  ["Reline","Kaidenin doku yüzeyine akrilik eklenmesi"],
+  ["Rebase","Dişler korunarak kaidenin tümüyle yenilenmesi"],
+  ["İmmediat protez","Çekim seansında takılan protez"],
+  ["Doku koşullandırıcı","Deforme mukozanın iyileştirilmesi"],
+  ["Overdenture","Kök veya implant üstüne oturan protez"],
+  ["Esnek protez","Poliamid esaslı, metal kroşesiz protez"]
+ ]},
+ exam:[
+  {q:"Protez kırıklarının en sık nedeni nedir?",o:["Düşme gibi darbeler","Fazla polisaj","Suda bekletme","Renk değişimi"],a:0,why:"Elden kayma ve düşme en sık nedendir; ikinci sırada uyumsuzluk gelir."},
+  {q:"Tamirde otopolimerizan akriliğin basınçlı kapta polimerize edilmesi neyi azaltır?",o:["Rengi","Gözenekliliği","Boyutu","Ağırlığı"],a:1,why:"Basınç, monomer buharının kabarcık oluşturmasını engeller."},
+  {q:"Kemik rezorpsiyonu sonucu protezin oynaması durumunda ilk seçenek nedir?",o:["Protezi atmak","Besleme (reline)","Kroşe eklemek","Polisaj"],a:1,why:"Doku yüzeyine yeni akrilik eklenerek uyum yeniden kurulur."},
+  {q:"Yumuşak astar en çok hangi durumda seçilir?",o:["Geniş ve dolgun kretlerde","Keskin kret ve ince, ağrılı mukozada","Yeni protezlerde her zaman","Metal iskeletlerde"],a:1,why:"Basıncı yayarak ağrıyı azaltır."},
+  {q:"İmmediat protez uygulamasından sonra ne yapılması gerekir?",o:["Hiçbir şey","Kısa süre içinde kontrol ve besleme","Bir yıl beklemek","Protezi kaynatmak"],a:1,why:"İyileşme döneminde kemik hızla değişir."},
+  {q:"Overdenture'da en sık kullanılan tutucu sistemlerden biri hangisidir?",o:["Kroşe teli","Lokator veya bar-klips","Siman","Vakum bandı"],a:1,why:"Bar-klips, top ve lokator sistemleri yaygındır."},
+  {q:"Esnek protezlerin en belirgin sınırlılığı nedir?",o:["Aşırı rijit olmaları","Esneklikleri nedeniyle kuvvet dağılımının zayıf olması","Renklerinin olmaması","Ağır olmaları"],a:1,why:"Esneklik, kuvvetin dişlere ve kemiğe dengeli aktarılmasını zorlaştırır."},
+  {q:"Protezin gece çıkarılmasının temel nedeni nedir?",o:["Estetik","Mukozanın dinlenmesi ve mantar riskinin azalması","Protezin uzaması","Renginin açılması"],a:1,why:"Sürekli kapalı kalan mukozada stomatit riski artar."}
+ ]
+},
+
+{
+ id:"m8", code:"C1", tag:"Sabit Protez", title:"Sabit Protez ve Uygulamaları-II",
+ sub:"CAD/CAM, zirkonya, laminate veneer, adeziv köprüler ve simantasyon.",
+ sections:[
+  {h:"Dijital iş akışı ve CAD/CAM", body:`
+   <p>Dijital protez üretimi üç aşamalıdır: <b>tarama → tasarım → üretim.</b></p>
+   <h4>Tarama</h4>
+   <ul>
+    <li><b>Ağız içi tarayıcı:</b> Doğrudan hastadan dijital ölçü alır; ölçü maddesinin boyutsal hatasını ortadan kaldırır.</li>
+    <li><b>Masaüstü (laboratuvar) tarayıcı:</b> Alçı modeli veya ölçüyü tarar.</li>
+    <li>Kritik nokta: <b>bitim çizgisi net görünmelidir.</b> Kanama, tükürük veya dişeti örtmesi taramayı bozar.</li>
+   </ul>
+   <h4>Tasarım (CAD)</h4>
+   <p>Yazılımda bitim çizgisi işaretlenir, ekleme yolu belirlenir, siman aralığı (genellikle 30–60 µm) tanımlanır, anatomi kütüphaneden seçilip uyarlanır, temas ve oklüzyon dijital olarak kontrol edilir.</p>
+   <h4>Üretim (CAM)</h4>
+   <ul>
+    <li><b>Kazıma (subtraktif):</b> Blok veya diskten frezeleme. Zirkonya, lityum disilikat, PMMA, titanyum.</li>
+    <li><b>Ekleme (additif):</b> 3B yazıcı ile model, geçici restorasyon, cerrahi rehber ve döküm mumu üretimi; metal için lazer sinterleme.</li>
+   </ul>
+   <p>Dijital iş akışı hatayı yok etmez, yalnızca yerini değiştirir: kötü bir tarama, kötü bir ölçüyle aynı sonucu verir.</p>`},
+  {h:"Zirkonya ve tam seramik sistemler", body:`
+   <p><b>Zirkonya (ZrO₂)</b>, yüksek eğilme dayanımı (yaklaşık 900–1200 MPa) ile tam seramikler içinde en dayanıklı gruptur.</p>
+   <h4>Önemli özellikler</h4>
+   <ul>
+    <li>Kazıma <b>ön-sinterlenmiş (yumuşak) blokta</b> yapılır. Sinterleme sırasında yapı yaklaşık <b>%20–25 büzülür</b>; yazılım bu payı hesaba katarak büyütülmüş restorasyon keser.</li>
+    <li><b>Sinterleme</b> 1350–1550°C arasında, uzun süreli bir fırın döngüsüdür.</li>
+    <li>Renklendirme, sinterleme öncesi boyama likidiyle veya renkli blok seçimiyle yapılır.</li>
+    <li><b>Faz dönüşümü ile sertleşme:</b> Çatlak ucunda kristal yapı değişerek çatlağın ilerlemesini durdurur; bu zirkonyanın dayanım sırrıdır.</li>
+   </ul>
+   <h4>Kuşaklar</h4>
+   <ul>
+    <li><b>3Y-TZP (geleneksel):</b> En dayanıklı, en opak. Arka bölge ve altyapı.</li>
+    <li><b>4Y / 5Y (yüksek translüsent):</b> Daha estetik, daha düşük dayanım. Ön bölge ve monolitik kronlar.</li>
+   </ul>
+   <h4>Diğer tam seramikler</h4>
+   <ul>
+    <li><b>Lityum disilikat:</b> Yaklaşık 350–400 MPa; üstün estetik, asitle pürüzlendirilip adeziv simante edilebilir.</li>
+    <li><b>Feldspatik seramik:</b> En estetik, en kırılgan; laminate veneer için idealdir.</li>
+    <li><b>Cam infiltre / alümina esaslılar:</b> Büyük ölçüde zirkonyaya yerini bırakmıştır.</li>
+   </ul>`,
+   quiz:[
+    {q:"Zirkonya sinterleme sırasında yaklaşık ne kadar büzülür?",o:["%1","%5","%20–25","%50"],a:2,why:"Bu nedenle restorasyon büyütülmüş ölçülerde kazınır."},
+    {q:"Hangi seramik en yüksek eğilme dayanımına sahiptir?",o:["Feldspatik seramik","Lityum disilikat","Zirkonya","Cam iyonomer"],a:2,why:"Zirkonya 900 MPa üzerindeki değerlerle en dayanıklı gruptur."},
+    {q:"Laminate veneer için en estetik seçenek hangisidir?",o:["Opak zirkonya","Feldspatik seramik","Krom-kobalt","Titanyum"],a:1,why:"Feldspatik seramik ışık geçirgenliği en yüksek malzemedir."}
+   ]},
+  {h:"Laminate veneer, adeziv köprü ve geçiciler", body:`
+   <h4>Laminate veneer (yaprak porselen)</h4>
+   <p>Ön dişin yalnızca vestibül yüzeyini örten, 0,3–0,7 mm kalınlığındaki ince seramik tabakadır. Diş dokusundan çok az madde kaldırılır.</p>
+   <ul>
+    <li><b>Endikasyon:</b> Renklenme, diastema (aralık), küçük kırık ve şekil bozuklukları.</li>
+    <li><b>Kontrendikasyon:</b> Aşırı madde kaybı, ağır bruksizm, uygun mine kalmamış dişler.</li>
+    <li>Bağlanma <b>mine</b> üzerinde en yüksektir; bu nedenle preparasyon mine sınırları içinde kalmalıdır.</li>
+    <li>Laboratuvarda refrakter day veya presleme/kazıma yöntemiyle üretilir; çok ince olduğu için kırılmaya karşı dikkatli taşınır.</li>
+   </ul>
+   <h4>Adeziv (Maryland) köprü</h4>
+   <p>Komşu dişlerin arka yüzeyine kanatlarla yapıştırılan, minimal preparasyonlu köprüdür. Genç hastada ve tek diş eksikliğinde iyi bir seçenektir; ancak yapışma yüzeyi sınırlı olduğundan ayrılma (debonding) riski taşır.</p>
+   <h4>Geçici restorasyonlar</h4>
+   <p>Geçici, yalnızca zaman doldurmaz; <b>dişi korur, dişetini şekillendirir, estetiği ve oklüzyonu test eder.</b></p>
+   <ul>
+    <li>PMMA veya bis-akril esaslı olabilir; CAD/CAM ile de üretilir.</li>
+    <li>Kenar uyumu iyi ve yüzeyi cilalı olmalıdır; pürüzlü geçici dişeti iltihabı yapar ve son ölçüyü bozar.</li>
+    <li>Geçici siman, kolay sökülebilen ve öjenolsüz (adeziv simantasyon yapılacaksa) türden seçilir.</li>
+   </ul>`},
+  {h:"Simantasyon ve teslim", body:`
+   <h4>Siman türleri</h4>
+   <ul>
+    <li><b>Çinko fosfat:</b> Klasik, uzun geçmişi olan geleneksel siman.</li>
+    <li><b>Cam iyonomer / rezin modifiye cam iyonomer:</b> Flor salar, dişe kimyasal bağlanır.</li>
+    <li><b>Rezin siman:</b> En yüksek bağlanma dayanımı; tam seramik ve laminatede tercih edilir.</li>
+    <li><b>Geçici simanlar:</b> Çinko oksit esaslı, sökülebilir.</li>
+   </ul>
+   <h4>Yüzey hazırlığı — malzemeye göre değişir</h4>
+   <ul>
+    <li><b>Cam esaslı seramik (feldspatik, lityum disilikat):</b> Hidroflorik asit ile pürüzlendirme + <b>silan</b> uygulaması.</li>
+    <li><b>Zirkonya:</b> Asitle pürüzlenmez. Hafif kumlama + <b>MDP içerikli</b> primer/siman kullanılır.</li>
+    <li><b>Metal:</b> Kumlama ve metal primeri.</li>
+   </ul>
+   <p><b>Sık yapılan hata:</b> Zirkonyaya hidroflorik asit uygulamak. Yüzeyi pürüzlendirmez, yalnızca kontaminasyon yaratır.</p>
+   <h4>Teslim öncesi laboratuvar kontrol listesi</h4>
+   <ol>
+    <li>Day üzerinde tam oturma ve kenar uyumu.</li>
+    <li>Komşu temaslar: diş ipi hafif dirençle geçmeli.</li>
+    <li>Artikülatörde statik ve dinamik oklüzyon; erken temas yok.</li>
+    <li>Renk, yüzey dokusu ve parlaklık.</li>
+    <li>İç yüzeyde artık, taşlama tozu veya kumlama kalıntısı olmaması.</li>
+    <li>Taşlama yapıldıysa <b>yeniden glazür veya polisaj</b> (pürüzlü seramik karşı dişi aşındırır).</li>
+   </ol>`,
+   quiz:[
+    {q:"Zirkonya yüzeyi simantasyon öncesi nasıl hazırlanır?",o:["Hidroflorik asit ile pürüzlendirilir","Hafif kumlama ve MDP içerikli primer ile","Sadece suyla yıkanır","Alkolle silinir, başka işlem gerekmez"],a:1,why:"Zirkonya cam faz içermediği için asitle pürüzlenmez."},
+    {q:"Laminate veneer için bağlanmanın en güçlü olduğu doku hangisidir?",o:["Dentin","Mine","Sement","Pulpa"],a:1,why:"Mine üzerindeki adeziv bağ en dayanıklı ve en uzun ömürlüdür."},
+    {q:"Taşlanmış seramik yüzey neden yeniden glazürlenir veya cilalanır?",o:["Rengi koyulaşsın diye","Pürüzlü yüzey karşı dişi aşındırdığı için","Ağırlığı azalsın diye","Siman tutmasın diye"],a:1,why:"Pürüzlü seramik hem antagonist dişi aşındırır hem plak tutar."}
+   ]}
+ ],
+ match:{title:"Malzeme veya işlemi karşılığıyla eşleştir", pairs:[
+  ["Zirkonya","Sinterleme sonrası büzülür, en dayanıklı seramik"],
+  ["Lityum disilikat","Asitlenip adeziv simante edilebilen cam seramik"],
+  ["Feldspatik seramik","En estetik, laminate veneer için ideal"],
+  ["Silan","Cam seramik ile rezin arasında bağ kurar"],
+  ["Maryland köprü","Kanatlarla yapıştırılan minimal preparasyonlu köprü"],
+  ["Bis-akril","Geçici restorasyon malzemesi"]
+ ]},
+ exam:[
+  {q:"CAD/CAM iş akışının ilk aşaması nedir?",o:["Frezeleme","Tarama","Sinterleme","Glazür"],a:1,why:"Tarama → tasarım → üretim sırası izlenir."},
+  {q:"Zirkonya kazıması hangi aşamada yapılır?",o:["Tam sinterlenmiş blokta","Ön-sinterlenmiş (yumuşak) blokta","Eritilmiş halde","Toz halinde"],a:1,why:"Yumuşak blok daha kolay ve frez ömrünü koruyarak işlenir."},
+  {q:"Zirkonyanın çatlak ilerlemesini durduran mekanizması nedir?",o:["Faz dönüşümü ile sertleşme","Buharlaşma","Erime","Oksitlenme"],a:0,why:"Çatlak ucunda tetragonal-monoklinik dönüşüm hacim artışıyla çatlağı sıkıştırır."},
+  {q:"Laminate veneer kalınlığı genellikle ne kadardır?",o:["0,05 mm","0,3–0,7 mm","1,5–2 mm","3 mm"],a:1,why:"İnce yaprak seramiktir; minimal preparasyon gerektirir."},
+  {q:"Geçici restorasyonun görevlerinden biri değildir:",o:["Dişi korumak","Dişetini şekillendirmek","Oklüzyonu test etmek","Kalıcı olarak kullanılmak"],a:3,why:"Geçici, kalıcı restorasyona kadar geçen süre içindir."},
+  {q:"Tam seramik restorasyonlarda hangi siman tercih edilir?",o:["Geçici siman","Rezin siman","Çinko oksit öjenol","Alçı"],a:1,why:"Rezin siman en yüksek bağlanma dayanımını ve estetiği sağlar."},
+  {q:"Adeziv (Maryland) köprünün en büyük riski nedir?",o:["Aşırı madde kaybı","Debonding (ayrılma)","Renk değişimi olmaması","Yüksek maliyeti"],a:1,why:"Sınırlı yapışma yüzeyi nedeniyle ayrılabilir."},
+  {q:"Dijital tasarımda tanımlanan siman aralığı tipik olarak ne kadardır?",o:["0 µm","30–60 µm","300 µm","1 mm"],a:1,why:"Bu boşluk simanın akmasına ve restorasyonun tam oturmasına izin verir."}
+ ]
+},
+{
+ id:"m9", code:"C2", tag:"Enfeksiyon Kontrolü", title:"Sterilizasyon ve Dezenfeksiyon Yöntemleri",
+ sub:"Enfeksiyon zinciri, sterilizasyon yöntemleri, laboratuvar hijyeni ve kişisel korunma.",
+ sections:[
+  {h:"Temel kavramlar ve enfeksiyon zinciri", body:`
+   <p>Diş protez laboratuvarı, ağızdan gelen ölçü, model ve protezlerle sürekli temas eder. Bu nedenle laboratuvar, klinik kadar ciddi bir enfeksiyon kontrolü alanıdır.</p>
+   <h4>Kavramlar</h4>
+   <ul>
+    <li><b>Temizlik:</b> Görünür kir ve organik artığın mekanik olarak uzaklaştırılması. Her işlemin ön koşuludur.</li>
+    <li><b>Dezenfeksiyon:</b> Sporlar dışındaki mikroorganizmaların öldürülmesi veya sayısının güvenli düzeye indirilmesi.</li>
+    <li><b>Sterilizasyon:</b> Sporlar dahil <b>tüm</b> mikroorganizmaların yok edilmesi.</li>
+    <li><b>Antisepsi:</b> Canlı doku üzerindeki mikroorganizmaların azaltılması.</li>
+    <li><b>Asepsi:</b> Mikroorganizma bulaşını en baştan önleme yaklaşımı.</li>
+   </ul>
+   <h4>Enfeksiyon zinciri</h4>
+   <p>Etken → kaynak → çıkış yolu → bulaşma yolu → giriş yolu → duyarlı konak. Zincirin <b>herhangi bir halkasını kırmak</b> bulaşı durdurur; laboratuvarda en etkili halka bulaşma yolu (ölçü, model, el, alet) üzerinde çalışmaktır.</p>
+   <h4>Spaulding sınıflaması</h4>
+   <ul>
+    <li><b>Kritik:</b> Steril dokuya girer (cerrahi aletler) → sterilizasyon zorunlu.</li>
+    <li><b>Yarı kritik:</b> Mukozaya temas eder (ölçü kaşığı, ayna) → sterilizasyon veya yüksek düzey dezenfeksiyon.</li>
+    <li><b>Kritik olmayan:</b> Sağlam deriye temas eder (tezgâh, cihaz yüzeyi) → orta/düşük düzey dezenfeksiyon.</li>
+   </ul>`},
+  {h:"Sterilizasyon yöntemleri", fig:"autoclave", body:`
+   <h4>Isı ile sterilizasyon</h4>
+   <ul>
+    <li><b>Nemli ısı — otoklav (buhar):</b> En yaygın ve en güvenilir yöntem. <b>121°C'de 15–20 dakika</b> veya <b>134°C'de 3–4 dakika</b>. Basınç yaklaşık 2,1 bar. Paslanmayan aletler, kaşıklar, tekstil.</li>
+    <li><b>Kuru ısı (Pastör fırını):</b> 170°C'de 60 dk veya 160°C'de 120 dk. Kesici aletlerde ve yağlı maddelerde; korozyon yapmaz ama uzun sürer.</li>
+   </ul>
+   <h4>Kimyasal yöntemler</h4>
+   <ul>
+    <li><b>Etilen oksit:</b> Isıya duyarlı plastikler için; uzun havalandırma gerektirir, toksiktir.</li>
+    <li><b>Plazma (hidrojen peroksit):</b> Düşük ısı, hızlı, artık bırakmaz; selüloz içeren malzemede kullanılmaz.</li>
+    <li><b>Glutaraldehit / OPA:</b> Uzun daldırma süresiyle yüksek düzey dezenfeksiyon.</li>
+   </ul>
+   <h4>Kontrol (indikatörler)</h4>
+   <ul>
+    <li><b>Fiziksel:</b> Cihazın ısı, basınç ve süre kayıtları.</li>
+    <li><b>Kimyasal:</b> Bantlar ve iç indikatörler; koşullara ulaşıldığını gösterir, sterilliği kanıtlamaz.</li>
+    <li><b>Biyolojik (spor testi):</b> Tek gerçek kanıttır; düzenli aralıklarla uygulanır. <i>Geobacillus stearothermophilus</i> sporları kullanılır.</li>
+   </ul>
+   <p>Paketleme kuralı: aletler temizlenip kurutulmadan paketlenmez; ıslak paket <b>steril kabul edilmez.</b></p>`,
+   quiz:[
+    {q:"Sterilizasyon ile dezenfeksiyon arasındaki temel fark nedir?",o:["Sterilizasyon sporları da öldürür","Dezenfeksiyon daha pahalıdır","Sterilizasyon sadece kimyasaldır","Fark yoktur"],a:0,why:"Dezenfeksiyon sporlara etkili değildir."},
+    {q:"Otoklavda 134°C için tipik plato süresi nedir?",o:["30 saniye","3–4 dakika","60 dakika","3 saat"],a:1,why:"121°C'de 15–20 dk, 134°C'de 3–4 dk uygulanır."},
+    {q:"Sterilizasyonun gerçekleştiğinin tek gerçek kanıtı hangisidir?",o:["Bandın renk değiştirmesi","Biyolojik (spor) test","Cihazın sesi","Paketin kuru olması"],a:1,why:"Kimyasal indikatör yalnızca koşullara ulaşıldığını gösterir."}
+   ]},
+  {h:"Laboratuvarda ölçü, model ve protezin dezenfeksiyonu", body:`
+   <p>Klinikten gelen her ölçü ve protez <b>kontamine kabul edilir.</b> Laboratuvara giriş noktasında ayrı bir "kabul alanı" bulunmalıdır.</p>
+   <h4>Ölçülerin dezenfeksiyonu</h4>
+   <ol>
+    <li>Akan su altında kan ve tükürükten arındırılır, hafifçe sarsılarak fazla su alınır.</li>
+    <li>Uygun dezenfektanla <b>sprey-bekletme-durulama</b> ya da kısa süreli daldırma uygulanır.</li>
+    <li><b>Aljinat</b> suya duyarlıdır: uzun daldırma şişmeye ve boyut hatasına yol açar; kısa süreli sprey yöntemi tercih edilir.</li>
+    <li><b>Silikon ve polieter</b> daldırmaya daha dayanıklıdır.</li>
+    <li>Dezenfeksiyon süresi ve ürünü, üreticinin ölçü maddesi için verdiği öneriye uymalıdır.</li>
+   </ol>
+   <h4>Model ve protezler</h4>
+   <ul>
+    <li>Alçı modeller gözenekli olduğu için dezenfeksiyonu zordur; sprey yöntemi ya da dezenfektan katkılı alçı suyu kullanılır.</li>
+    <li>Tamire gelen protezler önce mekanik temizlenir, sonra dezenfekte edilir; laboratuvara "kirli" girmez.</li>
+    <li>Teslim öncesi protez yeniden dezenfekte edilip kapalı, temiz poşetle gönderilir.</li>
+   </ul>
+   <h4>Ekipman hijyeni</h4>
+   <ul>
+    <li>Polisaj pomzası ve fırçalar en yüksek çapraz bulaş kaynaklarındandır: pomza her hasta için değiştirilmeli veya dezenfektan katkılı hazırlanmalıdır.</li>
+    <li>Frezler, ölçü kaşıkları ve spatüller ısıya dayanıklıysa otoklavlanır.</li>
+    <li>Tezgâh yüzeyleri, cihaz kolları ve kapı kolları gün içinde düzenli silinir.</li>
+   </ul>`},
+  {h:"Kişisel koruyucu donanım ve atık yönetimi", body:`
+   <h4>Kişisel koruyucu donanım (KKD)</h4>
+   <ul>
+    <li><b>Eldiven:</b> Her iş için değiştirilir; eldiven el yıkamanın yerini tutmaz.</li>
+    <li><b>Maske:</b> Alçı, akrilik ve metal tozuna karşı en önemli korunmadır. Taşlama-kumlama işlerinde toz maskesi/FFP tipi tercih edilir.</li>
+    <li><b>Koruyucu gözlük ve siperlik:</b> Frez ve taş parçacıklarına karşı zorunludur.</li>
+    <li><b>Önlük:</b> Laboratuvar dışına çıkarılmaz.</li>
+    <li><b>Havalandırma ve aspirasyon:</b> Taşlama tezgâhında yerel emiş sistemi bulunmalıdır.</li>
+   </ul>
+   <p>El hijyeni tüm önlemlerin temelidir: gözle görünür kirlenmede su ve sabun, diğer durumlarda alkol bazlı el antiseptiği kullanılır.</p>
+   <h4>Mesleki riskler</h4>
+   <ul>
+    <li><b>Silikozis:</b> Kuvars tozunun uzun süre solunması. Yaş çalışma ve emiş sistemiyle önlenir.</li>
+    <li><b>Metal buharı:</b> Döküm ve lehimde havalandırma şarttır.</li>
+    <li><b>Monomer:</b> Solunum ve cilt teması alerjiye yol açar; kapalı kapta çalışılır.</li>
+    <li><b>Gürültü ve titreşim:</b> Uzun süreli mikromotor kullanımında koruyucu önlem alınır.</li>
+   </ul>
+   <h4>Atık yönetimi</h4>
+   <ul>
+    <li><b>Kesici-delici atıklar</b> delinmeye dayanıklı kutuya atılır.</li>
+    <li><b>Tıbbi atık</b> kırmızı torbaya, evsel atık siyah torbaya ayrılır.</li>
+    <li>Kimyasal ve metal artıkları ayrı toplanır; lavaboya dökülmez.</li>
+   </ul>`,
+   quiz:[
+    {q:"Aljinat ölçüde uzun süreli daldırma neden sakıncalıdır?",o:["Rengi değişir","Su emerek şişer ve boyut hatası oluşur","Sertleşmesi hızlanır","Kokusu artar"],a:1,why:"İmbibisyon nedeniyle ölçü büyür; kısa sprey yöntemi tercih edilir."},
+    {q:"Laboratuvarda silikozis riskini azaltan en önemli önlem nedir?",o:["Eldiven kullanmak","Toz emiş sistemi ve maske","Sık el yıkamak","Işığı artırmak"],a:1,why:"Solunabilir kuvars tozunun kaynağında yakalanması gerekir."},
+    {q:"Polisaj pomzası ile ilgili doğru uygulama hangisidir?",o:["Aylarca aynı pomza kullanılır","Her hasta için değiştirilir veya dezenfektan katkılı hazırlanır","Hiç ıslatılmaz","Tıbbi atık kutusuna atılır"],a:1,why:"Pomza önemli bir çapraz bulaş kaynağıdır."}
+   ]}
+ ],
+ match:{title:"Yöntemi veya kavramı karşılığıyla eşleştir", pairs:[
+  ["Otoklav","121°C / 15–20 dk buharlı sterilizasyon"],
+  ["Kuru ısı fırını","170°C / 60 dk, korozyon yapmaz"],
+  ["Biyolojik indikatör","Sterilizasyonun tek gerçek kanıtı"],
+  ["Antisepsi","Canlı doku üzerindeki mikropların azaltılması"],
+  ["Yarı kritik alet","Mukozaya temas eden alet"],
+  ["Kesici-delici atık","Delinmeye dayanıklı kutu"]
+ ]},
+ exam:[
+  {q:"Sporlar dahil tüm mikroorganizmaların yok edilmesi hangi kavramdır?",o:["Dezenfeksiyon","Antisepsi","Sterilizasyon","Temizlik"],a:2,why:"Sterilizasyon en kapsamlı işlemdir."},
+  {q:"Enfeksiyon zincirini kırmak için ne yapmak yeterlidir?",o:["Tüm halkaları yok etmek","Herhangi bir halkayı kırmak","Sadece etkeni yok etmek","Hiçbiri"],a:1,why:"Tek bir halkanın kırılması bulaşı durdurur."},
+  {q:"Otoklavda 121°C uygulamasında süre ne olmalıdır?",o:["2 dakika","15–20 dakika","60 dakika","120 dakika"],a:1,why:"Düşük ısıda süre uzar; 134°C'de süre kısalır."},
+  {q:"Islak paket için doğru olan hangisidir?",o:["Steril kabul edilir","Steril kabul edilmez","Daha uzun süre steril kalır","Kuruyunca sterildir"],a:1,why:"Nem, mikroorganizmaların paketten geçişine yol açar."},
+  {q:"Spaulding sınıflamasına göre ölçü kaşığı hangi gruptadır?",o:["Kritik","Yarı kritik","Kritik olmayan","Sınıflandırılamaz"],a:1,why:"Mukozaya temas ettiği için yarı kritik gruptadır."},
+  {q:"Etilen oksit ile sterilizasyonun temel sakıncası nedir?",o:["Çok hızlı olması","Uzun havalandırma gerektirmesi ve toksik olması","Isı gerektirmesi","Metalleri eritmesi"],a:1,why:"Kalıntı gazın uzaklaşması için havalandırma süresi gerekir."},
+  {q:"Klinikten gelen ölçüler laboratuvarda nasıl kabul edilmelidir?",o:["Temiz kabul edilir","Kontamine kabul edilir ve dezenfekte edilir","Doğrudan modele dökülür","Buzdolabında saklanır"],a:1,why:"Her ölçü potansiyel bulaş kaynağıdır."},
+  {q:"Akrilik monomerine karşı temel korunma yolu nedir?",o:["Açık ortamda uzun süre çalışmak","Kapalı kapta çalışmak ve havalandırma","Eldivensiz çalışmak","Isıtarak buharlaştırmak"],a:1,why:"Solunum ve cilt teması alerji ve tahriş yapar."}
+ ]
+},
+
+{
+ id:"m10", code:"C3", tag:"Porselen", title:"Porselen Protezleri-II",
+ sub:"Tam seramik sistemler, presleme, monolitik üretim, estetik katmanlama ve tamir.",
+ sections:[
+  {h:"Tam seramik sistemlerin sınıflandırılması", body:`
+   <p>Tam seramikler, içerdikleri cam faz oranına göre sınıflanır. Cam oranı arttıkça <b>estetik ve asitlenebilirlik</b> artar, <b>dayanım</b> azalır.</p>
+   <h4>Gruplar</h4>
+   <ul>
+    <li><b>Cam esaslı (feldspatik):</b> Yaklaşık 60–120 MPa. En yüksek ışık geçirgenliği. Laminate veneer ve inley.</li>
+    <li><b>Cam esaslı, doldurucu katkılı (lösit destekli):</b> Yaklaşık 120–180 MPa. İnley, onley, ön kron.</li>
+    <li><b>Lityum disilikat:</b> 350–400 MPa. Ön ve arka tek kronlar, ön bölge küçük köprüler; hem preslenir hem kazınır.</li>
+    <li><b>Polikristalin (zirkonya, alümina):</b> 600–1200+ MPa. Cam faz yok, bu yüzden asitle pürüzlendirilemez.</li>
+    <li><b>Hibrit / rezin matriks seramikler:</b> Elastikliği dentine yakın, kolay işlenir; aşınma ve renklenme sınırlılığı vardır.</li>
+   </ul>
+   <h4>Seçim mantığı</h4>
+   <p>Kural basittir: <b>öndeyse estetik, arkadaysa dayanım</b> öne çıkar. Bruksizmi olan hastada monolitik zirkonya, gülüş estetiğinde feldspatik veya katmanlı lityum disilikat tercih edilir. Bağlanma gerektiren minimal preparasyonlarda mutlaka asitlenebilen bir cam seramik seçilmelidir.</p>`},
+  {h:"Presleme ve monolitik üretim", body:`
+   <h4>Isı ve basınçla presleme (press tekniği)</h4>
+   <ol>
+    <li>Restorasyon mumla modellenir (tam anatomik ya da altyapı biçiminde).</li>
+    <li>Özel silindire tijlenip fosfat bağlı revetmana alınır.</li>
+    <li>Ön ısıtma fırınında mum atılır (850°C civarı).</li>
+    <li>Seramik ingot, presleme fırınında yaklaşık <b>900–920°C</b> ve vakum altında pistonla kalıba itilir.</li>
+    <li>Soğutma sonrası cam kumu ile <b>düşük basınçta</b> temizlenir; yüksek basınç kenarları kırar.</li>
+    <li>Reaksiyon tabakası varsa kısa hidroflorik asit banyosuyla uzaklaştırılır.</li>
+   </ol>
+   <p>Presleme, kazımaya göre daha ince kenar ve daha yoğun bir yapı sağlar; buna karşılık mum modelaj ve döküm zinciri gerektirir.</p>
+   <h4>Monolitik (tek parça) restorasyonlar</h4>
+   <p>Katmanlama yapılmadan, tek malzemeden üretilen restorasyonlardır. Katman ayrılması (chipping) sorununu ortadan kaldırır.</p>
+   <ul>
+    <li><b>Boyama (staining) tekniği:</b> Yüzeye renk ve karakterizasyon boyaları uygulanıp glazürlenir. Hızlı, dayanıklı, estetiği sınırlı.</li>
+    <li><b>Cut-back:</b> Kesici kenar bölgesinden bir miktar malzeme kaldırılıp yalnızca oraya mine porseleni katmanlanır. Dayanım ile estetiği dengeler.</li>
+    <li><b>Tam katmanlama:</b> En estetik, en zahmetli ve chipping riski en yüksek yöntem.</li>
+   </ul>`,
+   quiz:[
+    {q:"Lityum disilikat presleme sıcaklığı yaklaşık kaç derecedir?",o:["450°C","600°C","900–920°C","1500°C"],a:2,why:"Presleme fırınında vakum altında bu aralıkta uygulanır."},
+    {q:"Monolitik restorasyonun en önemli üstünlüğü nedir?",o:["Daha ucuz olması","Katman ayrılması (chipping) riskinin ortadan kalkması","Renginin hep beyaz olması","Simantasyon gerektirmemesi"],a:1,why:"Tek parça yapı, zayıf ara yüzeyi ortadan kaldırır."},
+    {q:"Cut-back tekniği ne sağlar?",o:["Tüm yüzeyin katmanlanmasını","Yalnızca kesici kenarın katmanlanmasıyla dayanım-estetik dengesini","Metal altyapı kullanımını","Sinterlemeden kaçınmayı"],a:1,why:"Gövde monolitik kalır, estetik bölge katmanlanır."}
+   ]},
+  {h:"Estetik katmanlama ve renk yönetimi", fig:"layers", body:`
+   <p>Doğal diş tek renk değildir. İyi bir restorasyon, rengin <b>derinlik</b> ve <b>optik davranışını</b> taklit eder.</p>
+   <h4>Doğal dişin optik özellikleri</h4>
+   <ul>
+    <li><b>Opalesans:</b> Mine, gelen ışığın mavi bileşenini saçar, geçen ışıkta turuncu-kehribar görünür.</li>
+    <li><b>Floresans:</b> Doğal diş, mor ötesi ışık altında hafif parlar; floresansı olmayan restorasyon gece ışığında gri ve cansız görünür.</li>
+    <li><b>Translüsenslik:</b> Kesici kenarda en yüksektir; servikalde düşer.</li>
+    <li><b>Yüzey dokusu:</b> Perikimata çizgileri, tüberkül ve oluklar ışığı kırar. Dokusuz düz yüzey yapay durur.</li>
+   </ul>
+   <h4>Katmanlama mantığı</h4>
+   <ol>
+    <li>Servikalde daha doygun (yoğun) dentin kullanılır.</li>
+    <li>Gövde bölgesinde ana dentin kütlesi oluşturulur; mamelon yapıları modellenebilir.</li>
+    <li>Mamelonlar arasına opal veya transparan kütle yerleştirilerek derinlik verilir.</li>
+    <li>Üstü mine porseleniyle kapatılır.</li>
+    <li>Yüzey dokusu verilir, glazür ve isteğe bağlı mekanik parlatma yapılır.</li>
+   </ol>
+   <p>Zirkonya altyapılarda dikkat: altyapı çok opak ise restorasyon cansız görünür; bu nedenle uygun translüsenslikte blok ve ince bir <b>liner</b> katmanı seçilir.</p>
+   <h4>Kontrol</h4>
+   <p>Renk, fırın çıkışında değil, <b>doğal ışıkta ve nemli yüzeyde</b> değerlendirilir. Dijital fotoğraf ve renk skalasının aynı karede yer alması, laboratuvar-klinik iletişiminin en güvenilir yoludur.</p>`},
+  {h:"Seramikte başarısızlıklar ve tamir", body:`
+   <h4>Sık görülen başarısızlıklar</h4>
+   <ul>
+    <li><b>Chipping (katman kırılması):</b> Yetersiz altyapı desteği, hızlı soğutma, kalın katman veya oklüzal erken temas.</li>
+    <li><b>Toptan kırılma:</b> Yetersiz kalınlık, uygunsuz malzeme seçimi, bruksizm.</li>
+    <li><b>Simantasyon hatası:</b> Zirkonyaya asit uygulamak, silan kullanmamak, kontamine yüzey.</li>
+    <li><b>Karşı dişte aşınma:</b> Cilalanmamış, pürüzlü seramik yüzey.</li>
+    <li><b>Marjinal açıklık:</b> Kötü tarama/ölçü, hatalı siman aralığı ayarı, sinterleme büzülme telafisinin yanlış hesaplanması.</li>
+   </ul>
+   <h4>Ağız içi tamir</h4>
+   <p>Küçük kırıklarda, restorasyonu sökmeden kompozit ile tamir yapılabilir:</p>
+   <ol>
+    <li>Yüzey pürüzlendirilir (hidroflorik asit cam seramikte; zirkonyada kumlama).</li>
+    <li>Silan veya uygun primer uygulanır.</li>
+    <li>Bonding ve kompozit tabakalanır, cilalanır.</li>
+   </ol>
+   <p>Tamir kalıcı bir çözüm değil, ömür uzatan bir ara çözümdür. Kırık nedeni (örneğin oklüzal erken temas) düzeltilmezse aynı yer tekrar kırılır.</p>
+   <h4>Laboratuvarın kalite kontrol alışkanlıkları</h4>
+   <ul>
+    <li>Her fırının pişim eğrisi düzenli olarak kalibre edilmelidir.</li>
+    <li>Sinterleme fırınında ısı sapması, uyumsuz ve zayıf zirkonya üretir.</li>
+    <li>Fırın rafları temiz tutulur; kirli raf renk lekesi yapar.</li>
+    <li>Her vaka için kullanılan blok, renk ve pişim programı kayıt altına alınır.</li>
+   </ul>`,
+   quiz:[
+    {q:"Chipping (katman kırılması) için tipik neden hangisidir?",o:["Fazla polisaj","Yetersiz altyapı desteği ve hızlı soğutma","Fazla glazür","Düşük siman kalınlığı"],a:1,why:"Desteklenmeyen kalın porselen ve gerilim birikimi katman kırılmasına yol açar."},
+    {q:"Doğal dişin mor ötesi ışıkta hafif parlamasına ne denir?",o:["Opalesans","Floresans","Translüsenslik","Metamerizm"],a:1,why:"Floresansı olmayan restorasyon yapay ışıkta gri görünür."},
+    {q:"Zirkonya restorasyonun ağız içi tamirinde yüzey nasıl hazırlanır?",o:["Hidroflorik asit ile","Kumlama ve uygun primer ile","Sadece alkol ile","Isıtarak"],a:1,why:"Cam faz içermediği için asit etkili değildir."}
+   ]}
+ ],
+ match:{title:"Sistemi özelliğiyle eşleştir", pairs:[
+  ["Feldspatik seramik","60–120 MPa, en yüksek translüsenslik"],
+  ["Lityum disilikat","350–400 MPa, preslenebilir ve kazınabilir"],
+  ["Monolitik zirkonya","Yüksek dayanım, chipping riski yok"],
+  ["Opalesans","Minenin mavi ışığı saçma özelliği"],
+  ["Cut-back","Yalnızca kesici kenarın katmanlanması"],
+  ["Liner","Opak altyapıyı yumuşatan ince ilk katman"]
+ ]},
+ exam:[
+  {q:"Cam faz oranı arttıkça seramikte ne olur?",o:["Dayanım artar, estetik azalır","Estetik artar, dayanım azalır","İkisi de artar","İkisi de azalır"],a:1,why:"Cam faz saydamlığı artırır ama kırılganlığı da artırır."},
+  {q:"Hangi seramik asitle pürüzlendirilemez?",o:["Feldspatik","Lösit destekli","Lityum disilikat","Zirkonya"],a:3,why:"Zirkonya polikristalindir, cam faz içermez."},
+  {q:"Presleme sonrası restorasyon nasıl temizlenmelidir?",o:["Yüksek basınçlı alüminyum oksitle","Düşük basınçlı cam kumu ile","Çekiçle","Suda kaynatılarak"],a:1,why:"Yüksek basınç ince kenarları kırar."},
+  {q:"Boyama (staining) tekniğinin sınırlılığı nedir?",o:["Çok uzun sürmesi","Derinlik hissinin sınırlı olması","Dayanımı düşürmesi","Renk verememesi"],a:1,why:"Yüzeysel renk, katmanlı restorasyonun optik derinliğini vermez."},
+  {q:"Kesici kenarda translüsensliği en yüksek katman hangisidir?",o:["Opak","Dentin","Mine (insizal)","Liner"],a:2,why:"Mine porseleni ışık geçirgenliği en yüksek katmandır."},
+  {q:"Sinterleme fırınındaki ısı sapmasının sonucu nedir?",o:["Daha parlak yüzey","Uyumsuz ve dayanımı düşük zirkonya","Daha hızlı üretim","Renk değişmez"],a:1,why:"Yanlış sinterleme hem boyutu hem mekanik özellikleri bozar."},
+  {q:"Restorasyon renginin değerlendirilmesi nasıl yapılmalıdır?",o:["Fırın çıkışında sıcakken","Doğal ışıkta ve nemli yüzeyde","Karanlık odada","Sadece fotoğraftan"],a:1,why:"Nem ve nötr ışık gerçek optik davranışı gösterir."},
+  {q:"Seramik tamiri hakkında doğru olan hangisidir?",o:["Kalıcı çözümdür","Ara çözümdür; kırık nedeni düzeltilmezse tekrarlar","Hiçbir zaman yapılamaz","Yalnızca metalde yapılır"],a:1,why:"Oklüzal hata sürerse aynı bölge yeniden kırılır."}
+ ]
+},
+
+{
+ id:"m11", code:"D2", tag:"Çene Yüz", title:"Çene Yüz Protezleri",
+ sub:"Maksillofasiyal protezler: obtüratörler, ekstraoral protezler ve silikon malzemeler.",
+ sections:[
+  {h:"Maksillofasiyal protez nedir?", body:`
+   <p>Çene yüz (maksillofasiyal) protezleri; doğuştan gelen bozukluklar, tümör cerrahisi veya travma sonucu oluşan <b>çene ve yüz kayıplarını</b> yeniden yapılandıran protezlerdir.</p>
+   <h4>Uygulama nedenleri</h4>
+   <ul>
+    <li><b>Doğumsal:</b> Damak yarığı, kulak kepçesi eksikliği (mikrotia/anotia).</li>
+    <li><b>Edinsel:</b> Tümör rezeksiyonu (maksillektomi, mandibulektomi), yanık, trafik kazası, ateşli silah yaralanması.</li>
+   </ul>
+   <h4>Hedefler</h4>
+   <ul>
+    <li><b>İşlev:</b> Çiğneme, yutma, konuşma ve solunumun düzeltilmesi.</li>
+    <li><b>Estetik:</b> Yüz simetrisinin ve sosyal görünümün onarımı.</li>
+    <li><b>Koruma:</b> Açıkta kalan dokunun kapatılması ve iyileşmenin desteklenmesi.</li>
+    <li><b>Psikososyal destek:</b> Hastanın topluma dönüşünün kolaylaşması. Bu grup hastalarda beklenti yönetimi ve empati, teknik başarı kadar önemlidir.</li>
+   </ul>
+   <h4>Ekip çalışması</h4>
+   <p>Süreç; cerrah, protez uzmanı, radyasyon onkoloğu, konuşma terapisti, psikolog ve <b>protez teknikeri</b> birlikte yürütülür. Tekniker, hem ölçü hem renklendirme aşamalarında hastayla doğrudan çalışabilir.</p>`},
+  {h:"İntraoral protezler: obtüratörler", fig:"facial", body:`
+   <p>Maksiller rezeksiyon sonrası ağız ile burun/sinüs boşluğu arasında açıklık kalır. Bu açıklık kapatılmazsa yemek burundan kaçar, konuşma <b>hipernazal</b> olur.</p>
+   <h4>Obtüratör türleri</h4>
+   <ul>
+    <li><b>Cerrahi obtüratör:</b> Ameliyat sırasında yerleştirilir; pıhtıyı korur, hastanın ameliyattan sonra konuşup beslenmesini sağlar.</li>
+    <li><b>Geçici (iyileşme dönemi) obtüratörü:</b> Yaklaşık 1–6 ay kullanılır, doku değiştikçe beslenerek uyarlanır.</li>
+    <li><b>Daimî obtüratör:</b> Doku iyileşmesi tamamlandıktan sonra (yaklaşık 3–6 ay) yapılır; genellikle bölümlü protezle birleşiktir.</li>
+   </ul>
+   <h4>Laboratuvar ilkeleri</h4>
+   <ul>
+    <li>Bulbus (obtüratörün defekte giren kısmı) <b>içi boş</b> yapılır; ağırlık azalır, tutuculuk artar.</li>
+    <li>Alt açılar dikkatle değerlendirilir: bir miktar alt açı tutuculuk sağlar, fazlası protezin takılıp çıkarılmasını engeller.</li>
+    <li>Kalan dişler değerlidir; kroşe ve tırnaklarla tutuculuk sağlanır, gerekirse implant desteği düşünülür.</li>
+    <li>Yüzeyler pürüzsüz ve iyi cilalı olmalıdır; radyoterapi görmüş doku çok hassastır.</li>
+   </ul>
+   <p>Diğer intraoral uygulamalar: <b>damak kaldırıcı (palatal lift)</b>, <b>konuşma yardımcı protezi (speech bulb)</b> ve dil protezleri.</p>`,
+   quiz:[
+    {q:"Cerrahi obtüratör ne zaman yerleştirilir?",o:["Ameliyattan 6 ay sonra","Ameliyat sırasında","Radyoterapi bittikten sonra","Hiç yerleştirilmez"],a:1,why:"Pıhtıyı korur, hastanın erken dönemde beslenmesini ve konuşmasını sağlar."},
+    {q:"Obtüratör bulbusunun içi neden boş yapılır?",o:["Daha ucuz olsun diye","Ağırlığı azaltıp tutuculuğu artırmak için","Renk vermek için","Kolay kırılsın diye"],a:1,why:"Ağır protez yerinde duramaz."},
+    {q:"Maksiller defekt kapatılmazsa hangi konuşma sorunu görülür?",o:["Kekemelik","Hipernazal konuşma","Ses kısıklığı","Peltek konuşma"],a:1,why:"Hava burun boşluğuna kaçar."}
+   ]},
+  {h:"Ekstraoral protezler ve silikonlar", body:`
+   <p>Yüz üzerindeki doku kayıplarını karşılayan protezlerdir: <b>orbital (göz-çevresi), auriküler (kulak), nazal (burun)</b> ve kombine yüz protezleri.</p>
+   <h4>Malzeme</h4>
+   <p>Günümüzde standart malzeme <b>medikal sınıf silikon elastomerdir.</b> Nedeni: dokuya benzer esneklik, biyouyumluluk, kolay renklendirilebilirlik ve kimyasal dayanıklılık. Akrilik ise sert bölgelerde ve altyapıda kullanılır.</p>
+   <h4>Yapım aşamaları</h4>
+   <ol>
+    <li>Yüzden ölçü alınır (aljinat + alçı destek); solunum yolu açık bırakılır.</li>
+    <li>Mumdan modelaj yapılır; simetri karşı taraftan ölçülerek kurulur, hasta üzerinde prova edilir.</li>
+    <li>İki veya çok parçalı mufla hazırlanır, mum atılır.</li>
+    <li>Silikon, temel (intrinsik) renk pigmentleriyle karıştırılıp kalıba yerleştirilir ve polimerize edilir.</li>
+    <li>Çıkarılan protezin kenarları inceltilir (<b>bıçak sırtı kenar</b>) ki cilde görünmez şekilde geçsin.</li>
+    <li><b>Ekstrinsik renklendirme</b>: kılcal damar görünümü için renkli lif, yüzey boyaları ve mat/parlak ayarı yapılır.</li>
+   </ol>
+   <h4>Tutuculuk seçenekleri</h4>
+   <ul>
+    <li><b>Medikal yapıştırıcı:</b> Ucuz ve yaygın; günlük uygulama gerektirir, cildi tahriş edebilir.</li>
+    <li><b>Anatomik alt açılar:</b> Örneğin kulak veya burun boşluğundan destek alma.</li>
+    <li><b>Gözlük çerçevesi:</b> Orbital protezlerde hem tutucu hem kamuflaj sağlar.</li>
+    <li><b>Kemiğe yerleşen implantlar + mıknatıs veya bar-klips:</b> En güvenilir tutuculuk; hasta bağımsızlığını artırır.</li>
+   </ul>
+   <p>Silikon protezlerin ömrü genellikle <b>1–2 yıldır</b>: güneş ışığı, sigara dumanı, kozmetik ürünler ve temizlik maddeleri renk solmasına ve yüzey bozulmasına yol açar. Hastaya günlük ılık su ve yumuşak sabunla temizlik, protezi kalıbında saklama önerilir.</p>`},
+  {h:"Hasta bakımı ve izlem", body:`
+   <h4>Radyoterapi görmüş hastada özel dikkat</h4>
+   <ul>
+    <li>Mukoza incelmiş ve kurumuştur; en küçük baskı yara açar.</li>
+    <li>Tükürük azaldığı için (kserostomi) tutuculuk düşer ve çürük riski artar.</li>
+    <li><b>Osteoradyonekroz</b> riski nedeniyle protez baskısı ve travma en aza indirilmelidir.</li>
+    <li>Protez kenarları yuvarlatılır, yüzey kusursuz cilalanır, sık kontrol planlanır.</li>
+   </ul>
+   <h4>Hastaya anlatılacaklar</h4>
+   <ul>
+    <li>Protez her gün çıkarılıp temizlenir; doku dinlendirilir.</li>
+    <li>Silikon protez sert fırçayla ovulmaz; ılık su ve yumuşak sabun yeterlidir.</li>
+    <li>Renk solması normaldir; belirli aralıklarla yenileme gerekir.</li>
+    <li>Ağrı, kanama veya yeni bir şişlik durumunda beklemeden hekime başvurulmalıdır.</li>
+   </ul>
+   <h4>Teknikerin rolü</h4>
+   <p>Çene yüz protezinde tekniker yalnızca üretici değil, <b>estetik karar veren</b> kişidir: cilt tonu, damar deseni, kıl ve leke gibi ayrıntılar hastanın görünümünü belirler. Bu nedenle mümkün olduğunda renk seçimi hastanın yanında, gün ışığında yapılır ve fotoğraf kaydı tutulur.</p>`,
+   quiz:[
+    {q:"Ekstraoral protezlerde standart malzeme hangisidir?",o:["Isı ile polimerize akrilik","Medikal sınıf silikon elastomer","Krom-kobalt","Feldspatik porselen"],a:1,why:"Silikon, dokuya benzer esneklik ve renklendirilebilirlik sunar."},
+    {q:"Silikon yüz protezinin ortalama ömrü nedir?",o:["1 ay","1–2 yıl","10 yıl","Ömür boyu"],a:1,why:"Güneş, duman ve kozmetikler renk ve yüzey bozulmasına yol açar."},
+    {q:"Radyoterapi görmüş hastada en önemli risk nedir?",o:["Renk uyumsuzluğu","Osteoradyonekroz ve doku travması","Protezin ağır olması","Metal alerjisi"],a:1,why:"Işınlanmış kemik ve mukoza travmaya çok duyarlıdır."}
+   ]}
+ ],
+ match:{title:"Protezi veya kavramı karşılığıyla eşleştir", pairs:[
+  ["Cerrahi obtüratör","Ameliyat sırasında yerleştirilen protez"],
+  ["Palatal lift","Damağı kaldırarak konuşmayı düzelten protez"],
+  ["Auriküler protez","Kulak kepçesi protezi"],
+  ["İntrinsik renklendirme","Silikonun içine pigment karıştırılması"],
+  ["Kserostomi","Radyoterapiye bağlı ağız kuruluğu"],
+  ["Bıçak sırtı kenar","Protezin cilde görünmez geçişi"]
+ ]},
+ exam:[
+  {q:"Maksillofasiyal protezlerin hedefleri arasında yer almaz:",o:["İşlevin geri kazandırılması","Estetik onarım","Psikososyal destek","Diş çürüğünün tedavisi"],a:3,why:"Çürük tedavisi restoratif diş hekimliğinin konusudur."},
+  {q:"Daimî obtüratör genellikle ne zaman yapılır?",o:["Ameliyat sırasında","İlk hafta","Doku iyileşmesi tamamlandıktan sonra (3–6 ay)","Hiç yapılmaz"],a:2,why:"Doku stabilleşmeden yapılan protez kısa sürede uyumsuz kalır."},
+  {q:"Orbital protezlerde sık kullanılan pratik tutuculuk yöntemi hangisidir?",o:["Gözlük çerçevesi","Kroşe teli","Vakum","Vida"],a:0,why:"Gözlük hem tutuculuk sağlar hem kenarları gizler."},
+  {q:"En güvenilir ekstraoral tutuculuk yöntemi nedir?",o:["Medikal yapıştırıcı","Kemiğe yerleşen implant destekli sistemler","Bant","Alt açı"],a:1,why:"İmplant destekli mıknatıs veya bar-klips en stabil çözümdür."},
+  {q:"Yüz ölçüsü alınırken en önemli güvenlik önlemi nedir?",o:["Hastanın oturması","Solunum yolunun açık tutulması","Işığın kapatılması","Hızlı çalışmak"],a:1,why:"Burun delikleri kapatılmamalı, hasta sürekli gözlenmelidir."},
+  {q:"Ekstrinsik renklendirme ne anlama gelir?",o:["Silikonun içine pigment karıştırılması","Yüzeye boya ve damar detayı uygulanması","Fırında pişirme","Kumlama"],a:1,why:"İntrinsik içeriye, ekstrinsik yüzeye uygulanır."},
+  {q:"Silikon protezin temizliği nasıl yapılmalıdır?",o:["Çamaşır suyuyla","Ilık su ve yumuşak sabunla","Sert fırça ve macunla","Kaynatarak"],a:1,why:"Aşındırıcı ve kimyasal maddeler yüzeyi bozar."},
+  {q:"Maksiller defektte protez uygulanmazsa görülen sorun hangisidir?",o:["Sıvıların burundan kaçması","Diş renklenmesi","Kroşe kırılması","Alçı kabarması"],a:0,why:"Ağız-burun bağlantısı beslenmeyi ve konuşmayı bozar."}
+ ]
+},
+
+{
+ id:"m12", code:"D4", tag:"İmplantoloji", title:"İmplantüstü Protezler",
+ sub:"İmplant bileşenleri, ölçü teknikleri, sabit ve hareketli üstyapılar, bakım.",
+ sections:[
+  {h:"İmplant nedir, bileşenleri nelerdir?", fig:"implant", body:`
+   <p>Dental implant, çene kemiğine yerleştirilen ve üzerine protez yapılan yapay diş köküdür. Genellikle <b>titanyum</b> veya titanyum alaşımından, bazı durumlarda zirkonyadan üretilir.</p>
+   <h4>Osseointegrasyon</h4>
+   <p>İmplant yüzeyi ile canlı kemik arasında, araya bağ dokusu girmeden kurulan doğrudan yapısal bağdır. Genellikle <b>alt çenede 2–3 ay, üst çenede 3–6 ay</b> sürede tamamlanır. Erken yüklenme veya iyileşme döneminde hareket, bu bağın kurulmasını engeller.</p>
+   <h4>Bileşenler</h4>
+   <ul>
+    <li><b>Fikstür (implant gövdesi):</b> Kemik içindeki vidalı kısım.</li>
+    <li><b>Kapama vidası:</b> İyileşme sırasında fikstürün iç kısmını korur.</li>
+    <li><b>İyileşme başlığı (healing abutment):</b> Dişetinin şekillenmesini sağlar.</li>
+    <li><b>Abutment (dayanak):</b> Fikstür ile üstyapı arasındaki bağlantı parçası. Hazır, açılı veya hastaya özel (CAD/CAM) olabilir.</li>
+    <li><b>Ölçü parçası (transfer/coping) ve analog:</b> Ağızdaki konumun modele taşınmasını sağlar.</li>
+    <li><b>Üstyapı:</b> Kron, köprü veya hareketli protez.</li>
+   </ul>
+   <h4>Bağlantı tipleri</h4>
+   <p><b>Eksternal hex</b> (dışta altıgen) klasik tiptir. <b>İnternal (konik / morse) bağlantılar</b> günümüzde daha yaygındır: daha iyi sızdırmazlık, daha az vida gevşemesi ve daha iyi kuvvet dağılımı sağlar.</p>`},
+  {h:"Ölçü teknikleri ve model", body:`
+   <p>İmplant protezinde ölçünün amacı, dişte olduğu gibi bir yüzeyi kopyalamak değil, <b>implantın üç boyutlu konumunu ve açısını</b> aktarmaktır. Bu nedenle transfer parçaları kullanılır.</p>
+   <h4>İki temel teknik</h4>
+   <ul>
+    <li><b>Açık kaşık (pick-up) tekniği:</b> Transfer vidası kaşıktaki delikten dışarı çıkar. Ölçü çıkarılmadan önce vida gevşetilir ve transfer ölçünün içinde kalır. Çok üyeli ve açılı vakalarda daha doğrudur.</li>
+    <li><b>Kapalı kaşık (transfer/pop-up) tekniği:</b> Transfer ağızda kalır, ölçü çıkarıldıktan sonra sökülüp ölçüye geri yerleştirilir. Ağzı küçük hastalarda ve arka bölgede kolaydır; geri yerleştirmede hata payı vardır.</li>
+   </ul>
+   <h4>Splintleme</h4>
+   <p>Çok sayıda implantta transferler, akrilik veya ışıkla sertleşen çubuklarla birbirine bağlanır (splintlenir). Akrilik büzülmesini azaltmak için <b>parçalı kesip yeniden birleştirme</b> yöntemi uygulanır.</p>
+   <h4>Model</h4>
+   <ul>
+    <li>Transfere <b>analog</b> vidalanır ve model dökülür; analog, implantın modeldeki temsilcisidir.</li>
+    <li>Dişeti bölgesi <b>yumuşak (gingival) maske</b> ile hazırlanır; böylece çıkış profili (emergence profile) tasarlanabilir.</li>
+    <li>Dijital yolda ise <b>scan body</b> vidalanır ve ağız içi tarayıcı ile konum kaydedilir.</li>
+   </ul>
+   <p><b>Pasif uyum</b> implant protezinin altın kuralıdır: üstyapı, hiçbir vidayı zorlamadan tüm implantlara aynı anda oturmalıdır. Gerilimli oturma, vida kırılmasına ve kemik kaybına yol açar.</p>`,
+   quiz:[
+    {q:"Açık kaşık (pick-up) tekniğinin temel özelliği nedir?",o:["Transfer ağızda kalır","Transfer vidası kaşıktan dışarı çıkar ve transfer ölçüde kalır","Ölçü alınmaz","Sadece tek implantta kullanılır"],a:1,why:"Transferin ölçü içinde kalması konum hatasını azaltır."},
+    {q:"Modelde implantı temsil eden parça hangisidir?",o:["Abutment","Analog","Scan body","Kapama vidası"],a:1,why:"Analog, laboratuvarda implantın birebir kopyasıdır."},
+    {q:"İmplant üstyapısında pasif uyum ne demektir?",o:["Protezin gevşek olması","Üstyapının zorlanmadan tüm implantlara oturması","Vidaların çok sıkılması","Simanın fazla olması"],a:1,why:"Gerilim, vida kırılması ve kemik kaybı riskini artırır."}
+   ]},
+  {h:"Üstyapı seçenekleri", body:`
+   <h4>Sabit üstyapılar</h4>
+   <ul>
+    <li><b>Simante üstyapı:</b> Doğal dişteki gibi abutment üzerine simante edilir. Estetiği iyidir; ancak <b>artık siman</b> dişeti altında kalırsa peri-implantitis riski doğar.</li>
+    <li><b>Vida tutuculu üstyapı:</b> Sökülebilir olması en büyük üstünlüğüdür; siman riski yoktur. Vida deliği estetik bölgede sorun olabilir, kompozitle kapatılır.</li>
+    <li><b>Hibrit (vida tutuculu tam köprü):</b> Tam dişsiz çenede, 4–6 implant üzerine yapılan sabit protez.</li>
+   </ul>
+   <h4>Hareketli üstyapılar (implant destekli overdenture)</h4>
+   <ul>
+    <li><b>Lokator tutucu:</b> Düşük yükseklik gerektirir, farklı tutma güçlerinde parçaları vardır, bakımı kolaydır.</li>
+    <li><b>Top (ball) tutucu:</b> Basit ve ekonomiktir; tek tek implantlarda kullanılır.</li>
+    <li><b>Bar-klips:</b> İmplantları birbirine bağlar, kuvveti dağıtır; en iyi stabiliteyi verir ancak yer ve hijyen gereksinimi fazladır.</li>
+    <li><b>Mıknatıs:</b> Kolay takılıp çıkar, tutuculuğu daha düşüktür.</li>
+   </ul>
+   <p>Alt tam dişsiz çenede <b>iki implant destekli overdenture</b>, yaşam kalitesini en çok artıran ve maliyeti en dengeli çözümlerden biri kabul edilir.</p>
+   <h4>Laboratuvar dikkat noktaları</h4>
+   <ul>
+    <li>Vida sıkma torku üreticinin belirttiği değerde olmalı; teknikerin torku "elle" tahmin etmesi kabul edilmez.</li>
+    <li>Çıkış profili, dişetini destekleyecek ama sıkıştırmayacak biçimde tasarlanır.</li>
+    <li>Temizlenebilirlik estetikten önce gelir: köprü altı ara yüz fırçasının geçebileceği kadar açık olmalıdır.</li>
+    <li>Karşıt dişler doğal ise oklüzyon dengeli, hafif temaslı planlanır; implantın periodontal ligamenti yoktur ve kuvveti amortize edemez.</li>
+   </ul>`},
+  {h:"Komplikasyonlar ve bakım", body:`
+   <h4>Biyolojik komplikasyonlar</h4>
+   <ul>
+    <li><b>Peri-implant mukozit:</b> Yalnızca yumuşak dokuda iltihap; temizlikle geri döndürülebilir.</li>
+    <li><b>Peri-implantitis:</b> Kemik kaybının eşlik ettiği iltihap. Nedenleri: kötü hijyen, artık siman, sigara, kontrolsüz diyabet, aşırı yükleme.</li>
+   </ul>
+   <h4>Mekanik komplikasyonlar</h4>
+   <ul>
+    <li><b>Vida gevşemesi:</b> En sık mekanik sorun. Nedeni genellikle pasif olmayan uyum veya aşırı oklüzal kuvvet.</li>
+    <li><b>Vida kırılması, abutment kırılması, üstyapıda chipping.</b></li>
+    <li><b>Overdenture tutucularının aşınması:</b> Lokator içlikleri düzenli değiştirilir.</li>
+    <li><b>İmplant kaybı:</b> Osseointegrasyon sağlanamaması ya da ilerlemiş peri-implantitis.</li>
+  </ul>
+   <h4>Hasta bakımı</h4>
+   <ul>
+    <li>Ara yüz fırçası, süperfloss ve ağız duşu günlük kullanılır.</li>
+    <li>Metal kazıyıcılar implant yüzeyini çizer; profesyonel temizlikte titanyum veya plastik uçlar kullanılır.</li>
+    <li>Sigara, implant başarısını en çok düşüren alışkanlıktır.</li>
+    <li>Yılda en az bir kez klinik ve radyografik kontrol yapılır.</li>
+   </ul>
+   <p>Teknikerin katkısı burada da belirleyicidir: temizlenebilir tasarım, pasif uyum ve doğru oklüzyon, komplikasyonların büyük bölümünü baştan önler.</p>`,
+   quiz:[
+    {q:"İmplantlarda en sık görülen mekanik sorun hangisidir?",o:["Vida gevşemesi","Renk değişimi","İmplantın erimesi","Siman kokusu"],a:0,why:"Pasif olmayan uyum ve aşırı kuvvet vida gevşemesine yol açar."},
+    {q:"Peri-implantitisin mukozitten farkı nedir?",o:["Kemik kaybının eşlik etmesi","Ağrısız olması","Yalnızca üst çenede görülmesi","Tedavi gerektirmemesi"],a:0,why:"Mukozit yumuşak dokuyla sınırlıdır ve geri döndürülebilir."},
+    {q:"İmplant destekli overdenture'da yaygın kullanılan tutucu hangisidir?",o:["Kroşe teli","Lokator","Çinko fosfat siman","Kompaund"],a:1,why:"Lokator düşük yükseklik gereksinimi ve kolay bakımıyla öne çıkar."}
+   ]}
+ ],
+ match:{title:"Bileşeni işleviyle eşleştir", pairs:[
+  ["Fikstür","Kemik içindeki implant gövdesi"],
+  ["İyileşme başlığı","Dişetinin şekillenmesini sağlar"],
+  ["Transfer (coping)","İmplant konumunu ölçüye taşır"],
+  ["Analog","Modeldeki implant temsilcisi"],
+  ["Scan body","Dijital ölçüde konumu tarayıcıya bildirir"],
+  ["Bar-klips","İmplantları bağlayan hareketli protez tutucusu"]
+ ]},
+ exam:[
+  {q:"İmplant ile kemik arasındaki doğrudan yapısal bağa ne ad verilir?",o:["Adezyon","Osseointegrasyon","Kohezyon","Sinterleme"],a:1,why:"Araya bağ dokusu girmeden kurulan bağdır."},
+  {q:"Osseointegrasyon süresi alt çenede yaklaşık ne kadardır?",o:["1 hafta","2–3 ay","1 yıl","3 yıl"],a:1,why:"Üst çenede kemik yoğunluğu daha düşük olduğu için süre uzar."},
+  {q:"Simante implant üstyapısının en önemli riski nedir?",o:["Vida deliği görünmesi","Dişeti altında kalan artık siman","Ağırlığı","Rengi"],a:1,why:"Artık siman peri-implantitisin sık nedenlerindendir."},
+  {q:"Vida tutuculu üstyapının en büyük üstünlüğü nedir?",o:["Daha ucuz olması","Sökülebilir olması ve siman riski taşımaması","Hiç kırılmaması","Ölçü gerektirmemesi"],a:1,why:"Bakım ve tamir için kolayca çıkarılabilir."},
+  {q:"Çok üyeli vakalarda hangi ölçü tekniği daha doğru kabul edilir?",o:["Kapalı kaşık","Açık kaşık (pick-up)","Aljinat ile tek aşamalı","Ölçü gerekmez"],a:1,why:"Transferin ölçüde kalması geri yerleştirme hatasını ortadan kaldırır."},
+  {q:"İmplant üstyapısında oklüzyon nasıl planlanır?",o:["Doğal dişten daha ağır temaslı","Dengeli ve hafif temaslı","Hiç temas olmayacak biçimde","Yalnızca tek noktada"],a:1,why:"İmplantın periodontal ligamenti yoktur, kuvveti amortize edemez."},
+  {q:"Peri-implantitisin önlenmesinde en etkili etken hangisidir?",o:["Protezin rengi","Günlük hijyen ve temizlenebilir tasarım","Vida markası","Modelin cinsi"],a:1,why:"Plak kontrolü ve erişilebilir tasarım belirleyicidir."},
+  {q:"İmplant yüzeyinin temizliğinde ne kullanılmalıdır?",o:["Çelik kazıyıcı","Titanyum veya plastik uçlar","Zımpara","Tel fırça"],a:1,why:"Metal kazıyıcı yüzeyi çizer ve plak tutulumunu artırır."}
+ ]
+}
+];
+
+/* =====================================================================
+   İLERLEME HESABI
+   ===================================================================== */
+function steps(m){ return m.sections.length + 2; } // bölümler + eşleştirme + bitirme testi
+function doneCount(m){
+  const p = mp(m.id);
+  const passed = p.exam !== null && p.exam >= CONFIG.passMark ? 1 : 0;
+  return p.read.length + (p.match ? 1 : 0) + passed;
+}
+function modPct(m){ return Math.round(doneCount(m)/steps(m)*100); }
+function totalPct(){ return Math.round(MODULES.reduce((s,m)=>s+modPct(m),0)/MODULES.length); }
+function liveSeconds(){ return state.prog.seconds; }
+
+/* =====================================================================
+   ANA SAYFA
+   ===================================================================== */
+let curMod = null;
+function renderHome(){
+  curMod = null;
+  const pct = totalPct();
+  const finished = MODULES.filter(m=>modPct(m)===100).length;
+  const passedExams = MODULES.filter(m=>{const p=mp(m.id); return p.exam!==null && p.exam>=CONFIG.passMark;}).length;
+  $("#view").innerHTML = `
+  <section class="hero">
+    <p class="eyebrow">Merhaba ${esc(state.user.name.split(" ")[0])} · ${MODULES.length} modül</p>
+    <h1>Eğitim panelin</h1>
+    <p>Her modül teorik anlatım, şema, ara quiz, eşleştirme çalışması ve bitirme testinden oluşur. Bitirme testinden <b>%${CONFIG.passMark}</b> ve üzeri alman modülü tamamlamak için gerekir.</p>
+    <div class="stats">
+      <div class="stat"><span>Genel ilerleme</span><b>%${pct}</b></div>
+      <div class="stat"><span>Tamamlanan modül</span><b>${finished}/${MODULES.length}</b></div>
+      <div class="stat"><span>Geçilen bitirme testi</span><b>${passedExams}</b></div>
+      <div class="stat"><span>Sistemde geçen süre</span><b style="font-size:20px">${fmtTime(liveSeconds())}</b></div>
+    </div>
+    <div class="guide-row">
+      <p class="eyebrow" style="margin:0 0 10px">Renk skalası · her sekme bir modül</p>
+      <div class="shadeguide">
+        ${MODULES.map(m=>{const p=modPct(m); return `<div class="tab ${p===100?"on":p>0?"half":""}" title="${esc(m.title)} · %${p}">${m.code}</div>`;}).join("")}
+      </div>
+    </div>
+  </section>
+  <div class="grid">
+    ${MODULES.map((m,i)=>{
+      const p=modPct(m); const pr=mp(m.id);
+      return `<button class="card" onclick="openMod(${i})">
+        <div class="top"><h3>${esc(m.title)}</h3><span class="chip">${m.code}</span></div>
+        <p>${esc(m.sub)}</p>
+        <div class="bar"><i style="width:${p}%"></i></div>
+        <div class="meta"><span>${m.sections.length} bölüm · ${m.exam.length} soruluk test</span>
+        <span class="${p===100?"done-flag":""}">${p===100?"tamamlandı":"%"+p}</span></div>
+        ${pr.exam!==null?`<div class="meta"><span>bitirme testi</span><span>%${pr.exam}</span></div>`:""}
+      </button>`;
+    }).join("")}
+  </div>`;
+  window.scrollTo(0,0);
+}
+
+/* =====================================================================
+   MODÜL GÖRÜNÜMÜ
+   ===================================================================== */
+let curStep = 0;
+function openMod(i, step){
+  curMod = MODULES[i]; curStep = step ?? 0; renderMod();
+}
+function stepLabel(m,i){
+  if(i < m.sections.length) return (i+1)+". bölüm";
+  if(i === m.sections.length) return "Eşleştirme";
+  return "Bitirme testi";
+}
+function renderMod(){
+  const m = curMod, p = mp(m.id), total = steps(m);
+  const head = `
+    <div class="crumbs"><button class="ghost" onclick="renderHome()">← Modüller</button><span>${esc(m.tag)}</span></div>
+    <div class="mod-head">
+      <h1>${esc(m.title)}</h1>
+      <p style="margin:0;color:var(--ink-3)">${esc(m.sub)}</p>
+      <div class="bar" style="margin-top:14px"><i style="width:${modPct(m)}%"></i></div>
+      <div class="steps">
+        ${[...Array(total)].map((_,i)=>{
+          const ok = i<m.sections.length ? p.read.includes(i) : (i===m.sections.length ? !!p.match : (p.exam!==null&&p.exam>=CONFIG.passMark));
+          return `<button class="step ${i===curStep?"cur":""} ${ok?"ok":""}" onclick="goStep(${i})">${ok?"✓ ":""}${stepLabel(m,i)}</button>`;
+        }).join("")}
+      </div>
+    </div>`;
+  let body;
+  if(curStep < m.sections.length) body = sectionHTML(m, curStep);
+  else if(curStep === m.sections.length) body = matchHTML(m);
+  else body = examHTML(m);
+  $("#view").innerHTML = head + body + notesHTML(m);
+  window.scrollTo(0,0);
+}
+function goStep(i){ curStep=i; renderMod(); }
+
+/* ---------- öğrenci not defteri ---------- */
+function notesHTML(m){
+  const val = state.notes[m.id] || "";
+  return `<section class="panel" style="margin-top:16px">
+    <p class="eyebrow">Not defterim · ${esc(m.title)}</p>
+    <h2 style="font-size:19px;margin:6px 0 10px">Bu modülle ilgili notların</h2>
+    <p style="color:var(--ink-3);font-size:14px;margin-bottom:10px">Notların hesabına kaydedilir; başka bir cihazdan girdiğinde de burada olur. Eğitmenin ilerlemenle birlikte bu notları görebilir.</p>
+    <textarea id="note-box" oninput="noteChanged('${m.id}')" placeholder="Örnek: post-dam alanının sınırlarını tekrar et…"
+      style="width:100%;min-height:120px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font:15px var(--f-body);color:var(--ink);background:#fff;resize:vertical">${esc(val)}</textarea>
+    <div class="meta" style="margin-top:8px"><span id="note-state">kaydedildi</span><span>${val.length} karakter</span></div>
+  </section>`;
+}
+let noteTimer=null;
+function noteChanged(id){
+  const el=document.getElementById("note-box"), st=document.getElementById("note-state");
+  st.textContent="yazılıyor…";
+  clearTimeout(noteTimer);
+  noteTimer=setTimeout(()=>{ saveNote(id, el.value); st.textContent="kaydedildi"; }, 800);
+}
+
+/* ---------- bölüm ---------- */
+function videoHTML(m){
+  const id = CONFIG.videos[m.id];
+  return `<div class="video"><p class="eyebrow" style="margin-bottom:8px">Eğitici video</p><div class="frame">
+    ${id? `<iframe src="https://www.youtube.com/embed/${id}" title="${esc(m.title)}" allowfullscreen loading="lazy"></iframe>`
+        : `<div class="placeholder"><b>Video bu modül için henüz eklenmedi</b><span style="font-size:13px">Dosyadaki CONFIG.videos alanına <span class="mono">${m.id}: "VIDEO_KIMLIGI"</span> yazarak ekleyebilirsiniz.</span></div>`}
+  </div></div>`;
+}
+function sectionHTML(m,i){
+  const s = m.sections[i];
+  const q = s.quiz || [];
+  return `<article class="panel">
+    <p class="eyebrow">${i+1}. bölüm / ${m.sections.length}</p>
+    <h2>${esc(s.h)}</h2>
+    ${s.body}
+    ${s.fig? figure(s.fig):""}
+    ${i===0? videoHTML(m):""}
+    ${q.length? `<div style="margin-top:28px;border-top:2px solid var(--line);padding-top:20px">
+      <p class="eyebrow">Ara quiz · ${q.length} soru</p>
+      <h2 style="margin:6px 0 18px">Öğrendiğini hemen dene</h2>
+      <div id="quiz">${q.map((qq,qi)=>qBlock(qq,qi,"quiz")).join("")}</div></div>`:""}
+    <div class="nav-row">
+      <button class="ghost" onclick="goStep(${Math.max(0,i-1)})" ${i===0?"disabled":""}>← Önceki</button>
+      <button class="btn" id="next-btn" onclick="finishSection(${i})">Bölümü tamamla ve ilerle →</button>
+    </div>
+  </article>`;
+}
+function qBlock(q,i,ns){
+  return `<div class="q" data-q="${i}">
+    <div class="qtext"><span>${String(i+1).padStart(2,"0")}</span><div>${esc(q.q)}</div></div>
+    ${q.o.map((o,oi)=>`<button class="opt" onclick="answer('${ns}',${i},${oi},${q.a})">${esc(o)}</button>`).join("")}
+    <div class="why hidden" id="${ns}-why-${i}">${esc(q.why)}</div>
+  </div>`;
+}
+const answered = {};
+function answer(ns,qi,oi,correct){
+  const wrap = document.querySelectorAll("#"+(ns==="quiz"?"quiz":"exam")+" .q")[qi];
+  if(!wrap || wrap.dataset.done) return;
+  wrap.dataset.done = "1";
+  const opts = wrap.querySelectorAll(".opt");
+  opts.forEach((b,k)=>{ b.disabled=true;
+    if(k===correct) b.classList.add("right");
+    if(k===oi && oi!==correct) b.classList.add("wrong");
+  });
+  answered[ns+qi] = (oi===correct);
+  if(ns==="quiz"){ document.getElementById("quiz-why-"+qi).classList.remove("hidden"); }
+  if(ns==="exam"){
+    const all = document.querySelectorAll("#exam .q");
+    const done = [...all].filter(x=>x.dataset.done).length;
+    const sb = document.getElementById("submit-exam");
+    sb.textContent = done===all.length ? "Testi bitir ve sonucu gör" : "Yanıtlanan: "+done+" / "+all.length;
+    sb.disabled = done!==all.length;
+  }
+}
+function finishSection(i){
+  const m = curMod, s = m.sections[i], q = s.quiz||[];
+  if(q.length){
+    const all = document.querySelectorAll("#quiz .q");
+    const done = [...all].filter(x=>x.dataset.done).length;
+    if(done < q.length){ toast("Önce ara quizdeki "+q.length+" soruyu yanıtla."); return; }
+    let right=0; q.forEach((_,qi)=>{ if(answered["quiz"+qi]) right++; delete answered["quiz"+qi]; });
+    toast("Ara quiz: "+right+" / "+q.length+" doğru");
+  }
+  const p = mp(m.id);
+  if(!p.read.includes(i)) p.read.push(i);
+  save();
+  curStep = i+1; renderMod();
+}
+
+/* ---------- eşleştirme ---------- */
+let mSel=null, mSolved=0;
+function matchHTML(m){
+  const pairs = m.match.pairs;
+  const left = pairs.map((p,i)=>({t:p[0],i}));
+  const right = pairs.map((p,i)=>({t:p[1],i})).sort(()=>Math.random()-.5);
+  mSel=null; mSolved=0;
+  return `<article class="panel">
+    <p class="eyebrow">Eşleştirme çalışması</p>
+    <h2>${esc(m.match.title)}</h2>
+    <p style="color:var(--ink-3)">Soldan bir kavram, sağdan karşılığını seç. Doğru eşleşmeler yeşile döner.</p>
+    <p class="eyebrow" id="mstat">0 / ${pairs.length} eşleşti</p>
+    <div class="match" style="margin-top:14px">
+      <div><p class="col-h">Kavram</p>${left.map(x=>`<button class="mitem" data-side="L" data-i="${x.i}" onclick="pick(this)">${esc(x.t)}</button>`).join("")}</div>
+      <div><p class="col-h">Karşılığı</p>${right.map(x=>`<button class="mitem" data-side="R" data-i="${x.i}" onclick="pick(this)">${esc(x.t)}</button>`).join("")}</div>
+    </div>
+    <div class="nav-row">
+      <button class="ghost" onclick="goStep(${m.sections.length-1})">← Önceki</button>
+      <button class="btn" onclick="goStep(${m.sections.length+1})">Bitirme testine geç →</button>
+    </div>
+  </article>`;
+}
+function pick(el){
+  if(el.classList.contains("done")) return;
+  if(!mSel){ mSel=el; el.classList.add("sel"); return; }
+  if(mSel===el){ el.classList.remove("sel"); mSel=null; return; }
+  if(mSel.dataset.side===el.dataset.side){ mSel.classList.remove("sel"); mSel=el; el.classList.add("sel"); return; }
+  if(mSel.dataset.i===el.dataset.i){
+    [mSel,el].forEach(b=>{ b.classList.remove("sel"); b.classList.add("done"); b.insertAdjacentHTML("beforeend",'<span class="pin">✓</span>'); });
+    mSel=null; mSolved++;
+    const total = curMod.match.pairs.length;
+    document.getElementById("mstat").textContent = mSolved+" / "+total+" eşleşti";
+    if(mSolved===total){ mp(curMod.id).match=1; save(); toast("Eşleştirme tamamlandı"); renderMod && setTimeout(()=>{curStep=curMod.sections.length; renderModKeep();},600); }
+  } else {
+    const a=mSel,b=el; [a,b].forEach(x=>x.classList.add("shake"));
+    setTimeout(()=>{ [a,b].forEach(x=>{x.classList.remove("shake","sel")}); },340);
+    mSel=null;
+  }
+}
+function renderModKeep(){ const m=curMod, p=mp(m.id), total=steps(m);
+  const st=document.querySelectorAll(".steps .step");
+  if(st[m.sections.length]) st[m.sections.length].classList.add("ok");
+  document.querySelector(".mod-head .bar i").style.width = modPct(m)+"%";
+}
+
+/* ---------- bitirme testi ---------- */
+function examHTML(m){
+  const p = mp(m.id);
+  return `<article class="panel">
+    <p class="eyebrow">Bitirme testi · ${m.exam.length} soru · geçme notu %${CONFIG.passMark}</p>
+    <h2>${esc(m.title)} — modül testi</h2>
+    ${p.exam!==null? `<p class="why">Önceki en iyi sonucun: <b>%${p.exam}</b>. Testi yeniden çözebilirsin; en yüksek sonuç kaydedilir.</p>`:""}
+    <div id="exam" style="margin-top:18px">${m.exam.map((q,i)=>qBlock(q,i,"exam")).join("")}</div>
+    <div class="nav-row">
+      <button class="ghost" onclick="goStep(${m.sections.length})">← Eşleştirme</button>
+      <button class="btn" id="submit-exam" disabled onclick="submitExam()">Yanıtlanan: 0 / ${m.exam.length}</button>
+    </div>
+  </article>`;
+}
+function submitExam(){
+  const m = curMod;
+  let right=0; m.exam.forEach((_,i)=>{ if(answered["exam"+i]) right++; delete answered["exam"+i]; });
+  const pct = Math.round(right/m.exam.length*100);
+  const p = mp(m.id);
+  p.exam = Math.max(p.exam ?? 0, pct);
+  save();
+  const pass = pct>=CONFIG.passMark;
+  $("#view").innerHTML = `
+    <div class="crumbs"><button class="ghost" onclick="renderHome()">← Modüller</button><span>${esc(m.tag)}</span></div>
+    <article class="panel score">
+      <p class="eyebrow">${esc(m.title)}</p>
+      <div class="num ${pass?"pass":"no"}">%${pct}</div>
+      <h2 style="margin:12px 0 6px">${pass?"Tebrikler, modülü geçtin":"Geçme notunun altında kaldın"}</h2>
+      <p style="color:var(--ink-3);max-width:46ch;margin:0 auto 20px">${m.exam.length} sorudan <b>${right}</b> doğru. ${pass?"Bu modül tamamlandı olarak işaretlendi.":"Konuları gözden geçirip testi yeniden çözebilirsin; en yüksek sonucun kaydedilir."}</p>
+      <div class="nav-row" style="justify-content:center">
+        <button class="ghost" onclick="openMod(${MODULES.indexOf(m)},0)">Konuya dön</button>
+        <button class="btn" onclick="openMod(${MODULES.indexOf(m)},${m.sections.length+1})">Testi yeniden çöz</button>
+        ${pass && MODULES.indexOf(m)<MODULES.length-1? `<button class="btn pink" onclick="openMod(${MODULES.indexOf(m)+1},0)">Sıradaki modüle geç →</button>`:""}
+      </div>
+    </article>`;
+  window.scrollTo(0,0);
+}
+
+/* =====================================================================
+   PROFİL
+   ===================================================================== */
+function openProfile(){
+  const finished = MODULES.filter(m=>modPct(m)===100).length;
+  const d = document.createElement("div");
+  d.className="drawer"; d.id="drawer";
+  d.innerHTML = `<div class="box" onclick="event.stopPropagation()">
+    <p class="eyebrow">Öğrenci kaydı</p>
+    <h2 style="font-size:26px;font-weight:800;margin:6px 0 16px">${esc(state.user.name)}</h2>
+    <div class="kv"><span>E-posta</span><b>${esc(state.user.email)}</b></div>
+    <div class="kv"><span>Giriş yöntemi</span><b>${esc(state.user.provider||"—")}</b></div>
+    <div class="kv"><span>İlk giriş</span><b>${state.user.firstLogin? new Date(state.user.firstLogin).toLocaleString("tr-TR"): new Date(state.prog.firstSeen).toLocaleDateString("tr-TR")}</b></div>
+    ${state.user.lastLogin?`<div class="kv"><span>Bu oturum</span><b>${new Date(state.user.lastLogin).toLocaleString("tr-TR")}</b></div>`:""}
+    ${state.user.loginCount?`<div class="kv"><span>Toplam giriş</span><b>${state.user.loginCount} kez</b></div>`:""}
+    <div class="kv"><span>Kayıt yeri</span><b>${ONLINE?"Üniversite sunucusu":"Yalnızca bu tarayıcı"}</b></div>
+    <div class="kv"><span>Sistemde geçen süre</span><b>${fmtTime(liveSeconds())}</b></div>
+    <div class="kv"><span>Genel ilerleme</span><b>%${totalPct()}</b></div>
+    <div class="kv"><span>Tamamlanan modül</span><b>${finished} / ${MODULES.length}</b></div>
+    <p class="eyebrow" style="margin:20px 0 8px">Modül modül durum</p>
+    ${MODULES.map(m=>{const p=mp(m.id);
+      return `<div class="kv"><span style="text-transform:none;letter-spacing:0;font-family:var(--f-body);font-size:13.5px;color:var(--ink-2)">${esc(m.title)}</span>
+      <b>%${modPct(m)}${p.exam!==null?" · test %"+p.exam:""}</b></div>`;}).join("")}
+    <div class="nav-row">
+      ${state.user.role==="admin"?`<button class="ghost" onclick="window.open('admin.html','_blank')">Yönetim paneli</button>`:""}
+      <button class="ghost" onclick="resetProgress()">İlerlemeyi sıfırla</button>
+      <button class="ghost" onclick="closeDrawer()">Kapat</button>
+      <button class="btn" onclick="signOut()">Çıkış yap</button>
+    </div>
+  </div>`;
+  d.onclick = closeDrawer;
+  document.body.appendChild(d);
+}
+function closeDrawer(){ const d=$("#drawer"); if(d) d.remove(); }
+function resetProgress(){
+  if(!confirm("Tüm ilerlemen ve test sonuçların silinecek. Devam edilsin mi?")) return;
+  state.prog = { seconds:0, firstSeen:new Date().toISOString(), modules:{} };
+  save(); closeDrawer(); renderHome(); toast("İlerleme sıfırlandı");
+}
+
+/* =====================================================================
+   AÇILIŞ
+   ===================================================================== */
+function setupNote(msg, tone){
+  const n=$("#setup-note"); if(!n) return;
+  n.innerHTML=msg;
+  n.style.borderLeftColor = tone==="ok" ? "var(--mint)" : tone==="warn" ? "var(--alloy)" : "var(--acrylic)";
+}
+async function boot(){
+  // 1) sunucu yapılandırmasını al
+  try{
+    const cfg = await api("/config");
+    Object.assign(CONFIG, cfg);
+    ONLINE = true;
+  }catch(e){ ONLINE = false; }
+
+  // 2) açık oturum var mı
+  if(ONLINE){
+    try{ TOKEN = sessionStorage.getItem("dpt-token"); }catch(e){}
+    if(TOKEN){
+      try{ const me = await api("/me"); startApp(me.user, me.progress, me.notes); return; }
+      catch(e){ TOKEN=null; try{ sessionStorage.removeItem("dpt-token"); }catch(e2){} }
+    }
+  }
+
+  // 3) giriş ekranını kur
+  const devRow = document.querySelectorAll(".login-form .field");
+  if(ONLINE){
+    initGoogle(); initMicrosoft();
+    if(CONFIG.devLogin){
+      setupNote("<b>Geliştirme modu açık.</b> Parolasız e-posta girişi etkin. Canlı ortamda sunucudaki <span class='mono'>DEV_LOGIN</span> değerini <span class='mono'>false</span> yapın.","warn");
+    }else{
+      devRow.forEach(el=>el.classList.add("hidden"));
+      document.querySelector(".rule").classList.add("hidden");
+      $("#local-btn").classList.add("hidden");
+      setupNote("Giriş, üniversite hesabınız üzerinden doğrulanır. İlerlemeniz ve notlarınız hesabınıza kaydedilir.","ok");
+    }
+  }else{
+    $("#g-btn").addEventListener("click",()=>$("#login-err").textContent="Sunucuya bağlanılamadı; şimdilik yalnızca e-posta ile çevrimdışı giriş yapabilirsiniz.");
+    $("#ms-btn").addEventListener("click",()=>$("#login-err").textContent="Sunucuya bağlanılamadı; şimdilik yalnızca e-posta ile çevrimdışı giriş yapabilirsiniz.");
+    setupNote("<b>Çevrimdışı önizleme.</b> Sunucuya ulaşılamadı; ilerlemeniz yalnızca bu tarayıcıda saklanır ve yönetici paneline yansımaz.","warn");
+  }
+}
+
+$("#local-btn").addEventListener("click", ()=>{
+  const name=$("#in-name").value.trim(), mail=$("#in-mail").value.trim();
+  if(ONLINE) serverLogin("/auth/dev",{name,email:mail});
+  else offlineLogin(name, mail);
+});
+$("#in-mail").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#local-btn").click(); });
+$("#home-btn").addEventListener("click", renderHome);
+$("#prof-btn").addEventListener("click", openProfile);
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeDrawer(); });
+
+/* modül içindeyken geçen süreyi ayrıca say */
+setInterval(()=>{ if(curMod && state.user){ mp(curMod.id).seconds += 15; } }, 15000);
+
+boot();
+</script>
+</body>
+</html>
